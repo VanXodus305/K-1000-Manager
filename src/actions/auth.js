@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, signIn } from "@/utils/auth";
+import { auth, signIn } from "../utils/auth";
 
 export async function googleSignIn() {
 	try {
