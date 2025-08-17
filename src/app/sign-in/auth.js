@@ -2,9 +2,9 @@
 
 import { signIn, signOut } from "@/utils/auth";
 
-export async function signInDemo() {
+export async function signInWithGoogle() {
 	try {
-		await signIn("google");
+		await signIn("google", { redirectTo: "/sign-in?callback=authenticated" });
 	} catch (error) {
 		console.error("Sign-in error:", error);
 		throw error;
