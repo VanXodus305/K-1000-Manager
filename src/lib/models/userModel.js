@@ -23,11 +23,18 @@ const userSchema = new mongoose.Schema(
 			],
 		},
 
+		// Profile Information
+		profileImage: {
+			type: String,
+			default: null,
+		},
+
 		phoneNumber: {
 			type: String,
 			required: [true, "Phone number is required"],
 			unique: true,
 			match: [/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"],
+			default: null,
 		},
 
 		// College Information
@@ -37,12 +44,14 @@ const userSchema = new mongoose.Schema(
 			unique: true,
 			uppercase: true,
 			trim: true,
+			default: null,
 		},
 
 		department: {
 			type: String,
 			required: [true, "Department is required"],
 			trim: true,
+			default: null,
 		},
 
 		year: {
@@ -50,6 +59,7 @@ const userSchema = new mongoose.Schema(
 			required: [true, "Year is required"],
 			min: 1,
 			max: 5,
+			default: null,
 		},
 
 		role: {
@@ -62,12 +72,6 @@ const userSchema = new mongoose.Schema(
 		joiningDate: {
 			type: Date,
 			required: [true, "Joining date is required"],
-			default: Date.now,
-		},
-
-		// Profile Information
-		profileImage: {
-			type: String,
 			default: null,
 		},
 

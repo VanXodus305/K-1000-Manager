@@ -5,8 +5,6 @@ import { signInWithGoogle } from "../auth";
 export default async function SignInComponent() {
 	const session = await auth();
 
-	console.log("/profile session:", session);
-
 	if (session?.user && session.user.role === "admin") {
 		redirect("/dashboard");
 	}
