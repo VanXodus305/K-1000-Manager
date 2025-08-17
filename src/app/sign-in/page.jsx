@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/utils/auth";
 import SignInComponent from "./_components/SignIn";
@@ -11,6 +12,7 @@ export default async function SignIn({ searchParams }) {
 		switch (callback) {
 			case "authenticated":
 				await checkIfUserExists();
+				redirect("/dashboard");
 				break;
 			case "missing-role":
 				return (

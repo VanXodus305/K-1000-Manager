@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
 
 		phoneNumber: {
 			type: String,
-			required: [true, "Phone number is required"],
+			// required: [true, "Phone number is required"],
 			unique: true,
 			match: [/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"],
 			default: null,
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
 		// College Information
 		rollNumber: {
 			type: String,
-			required: [true, "Roll number is required"],
+			// required: [true, "Roll number is required"],
 			unique: true,
 			uppercase: true,
 			trim: true,
@@ -49,14 +49,14 @@ const userSchema = new mongoose.Schema(
 
 		department: {
 			type: String,
-			required: [true, "Department is required"],
+			// required: [true, "Department is required"],
 			trim: true,
 			default: null,
 		},
 
 		year: {
 			type: Number,
-			required: [true, "Year is required"],
+			// required: [true, "Year is required"],
 			min: 1,
 			max: 5,
 			default: null,
@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 		// Society Information
 		joiningDate: {
 			type: Date,
-			required: [true, "Joining date is required"],
+			// required: [true, "Joining date is required"],
 			default: null,
 		},
 

@@ -51,6 +51,13 @@ export async function checkIfUserExists() {
 				name: user.name,
 				email: user.email,
 				profileImage: user.image,
+
+				phoneNumber: null,
+				rollNumber: null,
+				department: null,
+				year: null,
+				joiningDate: null,
+
 				socialLinks: {
 					linkedin: "",
 					github: "",
