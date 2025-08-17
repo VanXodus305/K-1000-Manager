@@ -6,7 +6,7 @@ export default async function SignIn() {
   const session = await auth();
   console.log("/profile session:", session);
 
-  if (session?.user) {
+  if (session?.user && session.user.role === "admin") {
     redirect("/dashboard");
   }
   // User is not signed in, show sign-in options
