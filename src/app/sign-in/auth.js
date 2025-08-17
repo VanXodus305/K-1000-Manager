@@ -43,30 +43,29 @@ export async function checkIfUserExists() {
 		// Check if user already exists
 		const existingUser = await User.findOne({ email: session.user.email });
 
-		console.log(existingUser);
-
-		if (!existingUser) {
-			const { user } = session;
-			const data = {
-				name: user.name,
-				email: user.email,
-				profileImage: user.image,
-
-				phoneNumber: null,
-				rollNumber: null,
-				department: null,
-				year: null,
-				joiningDate: null,
-
-				socialLinks: {
-					linkedin: "",
-					github: "",
-					instagram: "",
-				},
-			};
-			User.create(data);
-			return true;
+		if (existingUser) {
+			return;
 		}
+
+		const { user } = session;
+		const data = {
+			name: user.name,
+			email: user.email,
+			profileImage: user.image,
+
+			phoneNumber: null,
+			rollNumber: null,
+			department: null,
+			year: null,
+			joiningDate: null,
+
+			socialLinks: {
+				linkedin: "",
+				github: "",
+				instagram: "",
+			},
+		};
+		User.create(data);
 	} catch (error) {
 		console.error("Error in auth callback:", error);
 		redirect("/sign-in?callback=error");
