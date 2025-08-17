@@ -9,6 +9,15 @@ export default async function SignIn({ searchParams }) {
 		redirect("/dashboard");
 	}
 
+	if (callback === "missing-role") {
+		return (
+			<span>
+				You are not authorized to access this page. Please contact the
+				administrator.
+			</span>
+		);
+	}
+
 	return (
 		<Suspense fallback={<div>Loading...</div>}>
 			<SignInComponent />
