@@ -1,4 +1,4 @@
-import { redirect } from "next/dist/server/api-utils";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import SignInComponent from "./_components/SignIn";
 
