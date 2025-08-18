@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import User from "@/lib/models/userModel";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -28,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				await connectDB();
 				const email = user?.email || token?.email;
 				if (email) {
+					const User = mongoose.models.User;
 					const dbUser = await User.findOne({ email });
 					if (dbUser) {
 						token.role = dbUser.role;
