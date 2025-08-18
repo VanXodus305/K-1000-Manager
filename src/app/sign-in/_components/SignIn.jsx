@@ -1,13 +1,6 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/utils/auth";
 import { signInWithGoogle } from "../auth";
 
 export default async function SignInComponent() {
-	const session = await auth();
-
-	if (session?.user && session.user.role === "admin") {
-		redirect("/dashboard");
-	}
 	// User is not signed in, show sign-in options
 	return (
 		<div className="flex flex-col items-center justify-center h-screen">
