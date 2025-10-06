@@ -3,6 +3,9 @@ import Google from "next-auth/providers/google";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
+  pages: {
+    signIn: "/sign-in",
+  },
   callbacks: {
     async signIn({ user, account, profile }) {
       // This callback runs in Node.js runtime, so we can use server actions

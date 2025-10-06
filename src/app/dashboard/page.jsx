@@ -1,9 +1,16 @@
 import React from "react";
+import { redirect } from "next/navigation";
 import { auth, signOut } from "@/utils/auth";
 import { getUserFromDB } from "@/lib/getUser";
 
 export default async function Dashboard() {
   const session = await auth();
+
+  // If not authenticated, redirect to sign-in
+  if (!session) {
+    redirect("/sign-in");
+  }
+
   const user = await getUserFromDB();
 
   // Check if user is admin
