@@ -1,73 +1,75 @@
 "use server";
 
 import mongoose from "mongoose";
+import { redirect } from "next/navigation";
 import User from "@/lib/models/userModel";
 import { auth, signIn, signOut } from "@/utils/auth";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 async function connectDB() {
-	if (mongoose.connection.readyState === 0) {
-		try {
-			await mongoose.connect(MONGODB_URI);
-		} catch (error) {
-			console.error("Error connecting to MongoDB Database:", error);
-		}
-	}
+  if (mongoose.connection.readyState === 0) {
+    try {
+      await mongoose.connect(MONGODB_URI);
+    } catch (error) {
+      console.error("Error connecting to MongoDB Database:", error);
+    }
+  }
 }
 
 export async function signInWithGoogle() {
-	try {
-		await signIn("google", { redirectTo: "/sign-in?callback=authenticated" });
-	} catch (error) {
-		console.error("Sign-in error:", error);
-		throw error;
-	}
+  await signIn("google", { redirectTo: "/dashboard" });
 }
 
 export async function signOutAndRedirect() {
-	try {
-		await signOut({ redirectTo: "/" });
-	} catch (error) {
-		console.error("Sign-out error:", error);
-		throw error;
-	}
+  await signOut({ redirectTo: "/" });
 }
 
 export async function checkIfUserExists() {
-	const session = await auth();
+  const session = await auth();
 
-	try {
-		await connectDB();
+  if (!session || !session.user) {
+    console.error("No session found in checkIfUserExists");
+    return;
+  }
 
-		// Check if user already exists
-		const existingUser = await User.findOne({ email: session.user.email });
+  try {
+    await connectDB();
+    console.log("Connected to DB, checking for user:", session.user.email);
 
-		if (existingUser) {
-			return;
-		}
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: session.user.email });
 
-		const { user } = session;
-		const data = {
-			name: user.name,
-			email: user.email,
-			profileImage: user.image,
+    if (existingUser) {
+      console.log("User already exists:", existingUser.email);
+      return;
+    }
 
-			phoneNumber: null,
-			rollNumber: null,
-			department: null,
-			year: null,
-			joiningDate: null,
+    console.log("Creating new user...");
+    const { user } = session;
+    const data = {
+      name: user.name,
+      email: user.email,
+      profileImage: user.image,
+      role: "member", // Default role for new users
 
-			socialLinks: {
-				linkedin: "",
-				github: "",
-				instagram: "",
-			},
-		};
-		User.create(data);
-	} catch (error) {
-		console.error("Error in auth callback:", error);
-		redirect("/sign-in?callback=error");
-	}
+      phoneNumber: null,
+      rollNumber: null,
+      department: null,
+      year: null,
+      joiningDate: null,
+
+      socialLinks: {
+        linkedin: "",
+        github: "",
+        instagram: "",
+      },
+    };
+    const newUser = await User.create(data);
+    console.log("User created successfully:", newUser.email);
+  } catch (error) {
+    console.error("Error in checkIfUserExists:", error);
+    console.error("Error details:", error.message);
+    // Don't redirect on error, just log it
+  }
 }
