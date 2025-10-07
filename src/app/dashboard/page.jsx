@@ -44,22 +44,42 @@ export default async function Dashboard() {
   }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome, {session?.user?.name}!</p>
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/sign-in" });
-        }}
-      >
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Sign Out
-        </button>
-      </form>
+    <div className="container mx-auto px-6 py-8">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+        <p className="text-foreground/70">
+          Welcome back, {session?.user?.name}!
+        </p>
+      </div>
+
+      {/* Dashboard content goes here */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Placeholder cards - replace with actual dashboard content */}
+        <div className="bg-background-200/60 backdrop-blur-md border border-primary/20 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-primary mb-2">
+            Quick Stats
+          </h2>
+          <p className="text-foreground/70">
+            Dashboard statistics will appear here
+          </p>
+        </div>
+
+        <div className="bg-background-200/60 backdrop-blur-md border border-primary/20 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-primary mb-2">
+            Recent Activity
+          </h2>
+          <p className="text-foreground/70">
+            Recent activities will appear here
+          </p>
+        </div>
+
+        <div className="bg-background-200/60 backdrop-blur-md border border-primary/20 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-primary mb-2">
+            System Status
+          </h2>
+          <p className="text-foreground/70">System status will appear here</p>
+        </div>
+      </div>
     </div>
   );
 }

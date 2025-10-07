@@ -34,7 +34,7 @@ export async function createOrGetUser(userData) {
     const newUser = await User.create({
       name: userData.name,
       email: userData.email,
-      profileImage: userData.image,
+      profileImage: userData.image.replace("=s96-c", ""),
       role: "member",
       phoneNumber: null,
       rollNumber: null,

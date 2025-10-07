@@ -16,7 +16,7 @@ module.exports = {
       colors: {
         background: {
           100: "#274F62",
-          200: "#0E2F3F",
+          200: "#091F2A",
         },
         primary: "#2ACCBB",
         secondary: "#F8FFC0",
@@ -24,6 +24,6 @@ module.exports = {
       },
     },
   },
-  // darkMode: "class",
+  darkMode: "class",
   plugins: [heroui()],
 };

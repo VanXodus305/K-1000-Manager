@@ -1,6 +1,7 @@
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Provider from "@/contexts/Provider";
+import GlobalNavbar from "@/components/Navbar";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -15,9 +16,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.className} bg-gradient-to-b from-background-200 to-background-100 min-h-screen`}
+        className={`${geistSans.className} bg-gradient-to-b from-background-200 to-background-100 min-h-screen dark`}
       >
-        <Provider>{children}</Provider>
+        <Provider>
+          <GlobalNavbar />
+          {children}
+        </Provider>
       </body>
     </html>
   );

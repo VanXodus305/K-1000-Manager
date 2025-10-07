@@ -50,7 +50,7 @@ export async function checkIfUserExists() {
     const data = {
       name: user.name,
       email: user.email,
-      profileImage: user.image,
+      profileImage: user.image.replace("=s96-c", ""), // Higher res image
       role: "member", // Default role for new users
 
       phoneNumber: null,
