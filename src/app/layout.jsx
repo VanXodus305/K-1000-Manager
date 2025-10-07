@@ -14,7 +14,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.className}`}>
+      <body
+        className={`${geistSans.className} bg-gradient-to-b from-background-200 to-background-100 min-h-screen`}
+      >
         <Provider>{children}</Provider>
       </body>
     </html>

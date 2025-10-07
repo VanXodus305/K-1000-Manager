@@ -14,13 +14,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#F0F0F0",
-        primary: "#1F2A37",
-        secondary: { 100: "#A0C4FF", 200: "#03438E" },
-        foreground: {
-          100: "#6B7280",
-          200: "#4B5563",
+        background: {
+          100: "#274F62",
+          200: "#0E2F3F",
         },
+        primary: "#2ACCBB",
+        secondary: "#F8FFC0",
+        foreground: "#F0F0F0",
       },
     },
   },
