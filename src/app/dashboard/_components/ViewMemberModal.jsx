@@ -9,6 +9,7 @@ import {
   Button,
   Chip,
   Divider,
+  Avatar,
 } from "@heroui/react";
 import { MdEmail, MdPerson, MdSchool, MdPhone } from "react-icons/md";
 import {
@@ -20,22 +21,56 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { BiSolidBriefcase } from "react-icons/bi";
+import { FaUser } from "react-icons/fa";
 
 export default function ViewMemberModal({ isOpen, onClose, member }) {
   if (!member) return null;
 
-  const InfoRow = ({ icon: Icon, label, value, isPrimary = false }) => {
-    // Don't render if value is empty, null, or undefined
+  // Helper function to format special role
+  const formatSpecialRole = (role) => {
+    if (!role) return null;
+    return role
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const InfoRow = ({
+    icon: Icon,
+    label,
+    value,
+    isPrimary = false,
+    isClickable = false,
+    clickType = null,
+  }) => {
+    // Don't render if value is empty, null, or undefined (but render "N/A")
     if (
-      !value ||
+      (!value && value !== "N/A") ||
       value === "" ||
       (Array.isArray(value) && value.length === 0)
     ) {
       return null;
     }
 
-    return (
-      <div className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5">
+    const getClickableHref = () => {
+      if (!isClickable) return null;
+
+      switch (clickType) {
+        case "email":
+          return `mailto:${value}`;
+        case "phone":
+          return `tel:${value}`;
+        case "whatsapp":
+          return `https://wa.me/${value.replace(/\D/g, "")}`;
+        default:
+          return null;
+      }
+    };
+
+    const href = getClickableHref();
+
+    const content = (
+      <>
         <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shrink-0">
           <Icon className="text-primary" size={18} />
         </div>
@@ -63,11 +98,30 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-foreground font-medium truncate">
+            <p
+              className={`text-sm text-foreground font-medium truncate ${
+                isClickable ? "hover:text-primary transition-colors" : ""
+              }`}
+            >
               {value}
             </p>
           )}
         </div>
+      </>
+    );
+
+    return isClickable && href ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5 hover:bg-primary/10 hover:border-primary/30 transition-all cursor-pointer"
+      >
+        {content}
+      </a>
+    ) : (
+      <div className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5">
+        {content}
       </div>
     );
   };
@@ -80,10 +134,17 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
         href={url.startsWith("http") ? url : `https://${url}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors"
+        className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5 hover:bg-primary/10 hover:border-primary/30 transition-all cursor-pointer"
       >
-        <Icon className="text-primary" size={18} />
-        <span className="text-sm text-foreground font-medium">{label}</span>
+        <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shrink-0">
+          <Icon className="text-primary" size={18} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-foreground/60 mb-0.5">Visit Profile</p>
+          <p className="text-sm text-foreground font-medium hover:text-primary transition-colors">
+            {label}
+          </p>
+        </div>
       </a>
     );
   };
@@ -111,6 +172,21 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
         </ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-3">
+            {/* Profile Picture */}
+            <div className="flex justify-center p-4">
+              <Avatar
+                src={member.profileImage}
+                icon={<FaUser size={48} />}
+                name={member.name}
+                className="w-32 h-32"
+                color="primary"
+                classNames={{
+                  base: "shrink-0 border-2 border-primary/30 shadow-lg shadow-primary/50",
+                  icon: "text-foreground/80",
+                }}
+              />
+            </div>
+
             {/* Basic Information */}
             <InfoRow icon={MdPerson} label="Full Name" value={member.name} />
 
@@ -118,6 +194,8 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               icon={MdEmail}
               label="College Email"
               value={member.email}
+              isClickable={true}
+              clickType="email"
             />
 
             {member.personalEmail && (
@@ -125,6 +203,8 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
                 icon={MdEmail}
                 label="Personal Email"
                 value={member.personalEmail}
+                isClickable={true}
+                clickType="email"
               />
             )}
 
@@ -151,32 +231,26 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {member.vertical && (
-                <InfoRow
-                  icon={BiSolidBriefcase}
-                  label="Vertical / Team"
-                  value={member.vertical}
-                  isPrimary={true}
-                />
-              )}
-
-              {member.subdomain && (
-                <InfoRow
-                  icon={BiSolidBriefcase}
-                  label="Sub Domain"
-                  value={member.subdomain}
-                />
-              )}
-            </div>
-
-            {member.specialRole && (
               <InfoRow
                 icon={BiSolidBriefcase}
-                label="Special Role"
-                value={member.specialRole}
-                isPrimary={true}
+                label="Vertical / Team"
+                value={member.vertical || "N/A"}
+                isPrimary={!!member.vertical}
               />
-            )}
+
+              <InfoRow
+                icon={BiSolidBriefcase}
+                label="Sub Domain"
+                value={member.subdomain || "N/A"}
+              />
+            </div>
+
+            <InfoRow
+              icon={BiSolidBriefcase}
+              label="Special Role"
+              value={formatSpecialRole(member.specialRole) || "N/A"}
+              isPrimary={!!member.specialRole}
+            />
 
             {/* Contact Information */}
             {(member.phoneNumber || member.whatsappNumber) && (
@@ -190,6 +264,8 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
                       icon={MdPhone}
                       label="Phone Number"
                       value={member.phoneNumber}
+                      isClickable={true}
+                      clickType="phone"
                     />
                   )}
 
@@ -198,6 +274,8 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
                       icon={FaWhatsapp}
                       label="WhatsApp Number"
                       value={member.whatsappNumber}
+                      isClickable={true}
+                      clickType="whatsapp"
                     />
                   )}
                 </div>
@@ -210,25 +288,31 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               member.socialLinks?.instagram) && (
               <>
                 <Divider className="my-2" />
-                <h3 className="text-sm font-semibold text-primary mb-1">
+                <h3 className="text-sm font-semibold text-primary">
                   Social Links
                 </h3>
-                <div className="flex flex-col gap-2">
-                  <SocialLink
-                    icon={FaLinkedin}
-                    label="LinkedIn"
-                    url={member.socialLinks?.linkedin}
-                  />
-                  <SocialLink
-                    icon={FaGithub}
-                    label="GitHub"
-                    url={member.socialLinks?.github}
-                  />
-                  <SocialLink
-                    icon={FaInstagram}
-                    label="Instagram"
-                    url={member.socialLinks?.instagram}
-                  />
+                <div className="grid grid-cols-3 gap-3">
+                  {member.socialLinks?.linkedin && (
+                    <SocialLink
+                      icon={FaLinkedin}
+                      label="LinkedIn"
+                      url={member.socialLinks.linkedin}
+                    />
+                  )}
+                  {member.socialLinks?.github && (
+                    <SocialLink
+                      icon={FaGithub}
+                      label="GitHub"
+                      url={member.socialLinks.github}
+                    />
+                  )}
+                  {member.socialLinks?.instagram && (
+                    <SocialLink
+                      icon={FaInstagram}
+                      label="Instagram"
+                      url={member.socialLinks.instagram}
+                    />
+                  )}
                 </div>
               </>
             )}

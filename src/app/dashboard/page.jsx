@@ -22,7 +22,8 @@ export default async function Dashboard() {
   }
 
   // Fetch all members from database
-  const { members } = await getAllMembers();
+  const result = await getAllMembers();
+  const members = result.success ? result.members : [];
 
   return <DashboardContent initialMembers={members} />;
 }

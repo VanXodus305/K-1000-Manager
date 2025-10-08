@@ -3,6 +3,7 @@
 import mongoose from "mongoose";
 import User from "../models/userModel";
 import { revalidatePath } from "next/cache";
+import { deleteImage } from "./imageActions";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -67,11 +68,13 @@ export async function addMember(memberData) {
       name: memberData.name,
       email: memberData.email,
       personalEmail: memberData.personalEmail || null,
+      profileImage: memberData.profileImage || null,
       rollNumber: memberData.rollNo,
       branch: memberData.branch || null,
       year: parseInt(memberData.year),
       vertical: memberData.vertical,
       subdomain: memberData.subdomain || null,
+      specialRole: memberData.specialRole || null,
       phoneNumber: memberData.phoneNumber || null,
       whatsappNumber: memberData.whatsappNumber || null,
       socialLinks: memberData.socialLinks || {
@@ -92,11 +95,13 @@ export async function addMember(memberData) {
         name: newMember.name,
         email: newMember.email,
         personalEmail: newMember.personalEmail,
+        profileImage: newMember.profileImage,
         rollNo: newMember.rollNumber,
         branch: newMember.branch,
         year: newMember.year,
         vertical: newMember.vertical,
         subdomain: newMember.subdomain,
+        specialRole: newMember.specialRole,
         phoneNumber: newMember.phoneNumber,
         whatsappNumber: newMember.whatsappNumber,
         socialLinks: newMember.socialLinks,
@@ -119,11 +124,13 @@ export async function updateMember(memberId, memberData) {
         name: memberData.name,
         email: memberData.email,
         personalEmail: memberData.personalEmail || null,
+        profileImage: memberData.profileImage || null,
         rollNumber: memberData.rollNo,
         branch: memberData.branch || null,
         year: parseInt(memberData.year),
         vertical: memberData.vertical,
         subdomain: memberData.subdomain || null,
+        specialRole: memberData.specialRole || null,
         phoneNumber: memberData.phoneNumber || null,
         whatsappNumber: memberData.whatsappNumber || null,
         socialLinks: memberData.socialLinks || {
@@ -149,11 +156,13 @@ export async function updateMember(memberId, memberData) {
         name: updatedMember.name,
         email: updatedMember.email,
         personalEmail: updatedMember.personalEmail,
+        profileImage: updatedMember.profileImage,
         rollNo: updatedMember.rollNumber,
         branch: updatedMember.branch,
         year: updatedMember.year,
         vertical: updatedMember.vertical,
         subdomain: updatedMember.subdomain,
+        specialRole: updatedMember.specialRole,
         phoneNumber: updatedMember.phoneNumber,
         whatsappNumber: updatedMember.whatsappNumber,
         socialLinks: updatedMember.socialLinks,
@@ -170,6 +179,19 @@ export async function deleteMembers(memberIds) {
   try {
     await connectDB();
 
+    // First, get the members to extract their profile image URLs
+    const members = await User.find({ _id: { $in: memberIds } }).select(
+      "profileImage"
+    );
+
+    // Delete profile images from Cloudinary
+    const deletePromises = members
+      .filter((member) => member.profileImage)
+      .map((member) => deleteImage(member.profileImage));
+
+    await Promise.allSettled(deletePromises);
+
+    // Then delete the members from database
     await User.deleteMany({ _id: { $in: memberIds } });
 
     revalidatePath("/dashboard");

@@ -8,12 +8,24 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Checkbox,
   Button,
   Chip,
   Pagination,
+  Avatar,
 } from "@heroui/react";
 import { FiEdit2, FiEye } from "react-icons/fi";
+import {
+  FaCrown,
+  FaUserTie,
+  FaUserShield,
+  FaUsersCog,
+  FaChartLine,
+  FaStar,
+  FaCode,
+  FaShieldAlt,
+  FaAward,
+  FaUser,
+} from "react-icons/fa";
 import localFont from "next/font/local";
 
 const conthrax = localFont({
@@ -44,13 +56,150 @@ export default function MembersTable({
     { key: "actions", label: "", sortable: false },
   ];
 
+  // Helper function to format special role
+  const formatSpecialRole = (role) => {
+    if (!role) return null;
+    return role
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  // Helper function to get role-specific styling and icon
+  const getRoleConfig = (role) => {
+    const configs = {
+      president: {
+        icon: FaCrown,
+        bgColor: "bg-amber-500/20",
+        textColor: "text-amber-500",
+        borderColor: "border-amber-500/40",
+      },
+      "vice-president": {
+        icon: FaCrown,
+        bgColor: "bg-amber-400/20",
+        textColor: "text-amber-400",
+        borderColor: "border-amber-400/40",
+      },
+      "general-secretary": {
+        icon: FaUserTie,
+        bgColor: "bg-blue-500/20",
+        textColor: "text-blue-500",
+        borderColor: "border-blue-500/40",
+      },
+      "joint-secretary": {
+        icon: FaUserTie,
+        bgColor: "bg-blue-400/20",
+        textColor: "text-blue-400",
+        borderColor: "border-blue-400/40",
+      },
+      director: {
+        icon: FaUserShield,
+        bgColor: "bg-purple-500/20",
+        textColor: "text-purple-500",
+        borderColor: "border-purple-500/40",
+      },
+      "deputy-director": {
+        icon: FaUserShield,
+        bgColor: "bg-purple-400/20",
+        textColor: "text-purple-400",
+        borderColor: "border-purple-400/40",
+      },
+      cto: {
+        icon: FaCode,
+        bgColor: "bg-green-500/20",
+        textColor: "text-green-500",
+        borderColor: "border-green-500/40",
+      },
+      "deputy-cto": {
+        icon: FaCode,
+        bgColor: "bg-green-400/20",
+        textColor: "text-green-400",
+        borderColor: "border-green-400/40",
+      },
+      cso: {
+        icon: FaShieldAlt,
+        bgColor: "bg-red-500/20",
+        textColor: "text-red-500",
+        borderColor: "border-red-500/40",
+      },
+      "deputy-cso": {
+        icon: FaShieldAlt,
+        bgColor: "bg-red-400/20",
+        textColor: "text-red-400",
+        borderColor: "border-red-400/40",
+      },
+      cco: {
+        icon: FaUsersCog,
+        bgColor: "bg-indigo-500/20",
+        textColor: "text-indigo-500",
+        borderColor: "border-indigo-500/40",
+      },
+      "deputy-cco": {
+        icon: FaUsersCog,
+        bgColor: "bg-indigo-400/20",
+        textColor: "text-indigo-400",
+        borderColor: "border-indigo-400/40",
+      },
+      lead: {
+        icon: FaStar,
+        bgColor: "bg-pink-500/20",
+        textColor: "text-pink-500",
+        borderColor: "border-pink-500/40",
+      },
+    };
+
+    return (
+      configs[role] || {
+        icon: FaAward,
+        bgColor: "bg-secondary/20",
+        textColor: "text-secondary",
+        borderColor: "border-secondary/40",
+      }
+    );
+  };
+
   const renderCell = (member, columnKey) => {
     switch (columnKey) {
       case "name":
+        const roleConfig = member.specialRole
+          ? getRoleConfig(member.specialRole)
+          : null;
+        const RoleIcon = roleConfig?.icon;
+
         return (
-          <span className="text-foreground font-medium">
-            {member.name || "-"}
-          </span>
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            <Avatar
+              src={member.profileImage}
+              icon={<FaUser size={20} />}
+              name={member.name}
+              size="md"
+              color="primary"
+              classNames={{
+                base: "shrink-0 border-2 border-primary/30",
+                icon: "text-foreground/30",
+              }}
+            />
+
+            {/* Name and Role */}
+            <div className="flex flex-col gap-1">
+              <span className="text-foreground font-medium">
+                {member.name || "-"}
+              </span>
+              {member.specialRole && roleConfig && (
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  startContent={
+                    RoleIcon && <RoleIcon className="ml-1" size={12} />
+                  }
+                  className={`${roleConfig.bgColor} ${roleConfig.textColor} border ${roleConfig.borderColor} font-semibold w-fit`}
+                >
+                  {formatSpecialRole(member.specialRole)}
+                </Chip>
+              )}
+            </div>
+          </div>
         );
       case "year":
         return <span className="text-foreground/80">{member.year || "-"}</span>;

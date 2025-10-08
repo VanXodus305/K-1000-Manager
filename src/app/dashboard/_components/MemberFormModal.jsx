@@ -13,9 +13,13 @@ import {
   Checkbox,
   Autocomplete,
   AutocompleteItem,
+  Avatar,
 } from "@heroui/react";
 import React, { useState, useEffect } from "react";
 import { getFormOptions } from "@/actions/memberActions";
+import { uploadImage, deleteImage } from "@/actions/imageActions";
+import { FaUser, FaCamera } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 export default function MemberFormModal({
   isOpen,
@@ -50,6 +54,9 @@ export default function MemberFormModal({
   const [sameAsPhone, setSameAsPhone] = useState(false);
   const [errors, setErrors] = useState({});
   const [otherSocietiesInput, setOtherSocietiesInput] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [formOptions, setFormOptions] = useState({
     years: ["1st", "2nd", "3rd", "4th", "5th"],
     branches: [],
@@ -68,6 +75,21 @@ export default function MemberFormModal({
       "Event Management",
     ],
     subdomains: [],
+    specialRoles: [
+      { key: "president", label: "President" },
+      { key: "vice-president", label: "Vice President" },
+      { key: "general-secretary", label: "General Secretary" },
+      { key: "joint-secretary", label: "Joint Secretary" },
+      { key: "director", label: "Director" },
+      { key: "deputy-director", label: "Deputy Director" },
+      { key: "cto", label: "CTO" },
+      { key: "deputy-cto", label: "Deputy CTO" },
+      { key: "cso", label: "CSO" },
+      { key: "deputy-cso", label: "Deputy CSO" },
+      { key: "lead", label: "Lead" },
+      { key: "cco", label: "CCO" },
+      { key: "deputy-cco", label: "Deputy CCO" },
+    ],
   });
 
   // Fetch form options from database
@@ -75,7 +97,11 @@ export default function MemberFormModal({
     const fetchOptions = async () => {
       const result = await getFormOptions();
       if (result.success) {
-        setFormOptions(result.options);
+        // Merge with existing specialRoles
+        setFormOptions((prev) => ({
+          ...prev,
+          ...result.options,
+        }));
       }
     };
 
@@ -94,6 +120,9 @@ export default function MemberFormModal({
           ? member.otherSocieties.join(", ")
           : ""
       );
+      // Set profile image preview
+      setImagePreview(member.profileImage || null);
+      setProfileImage(null);
       // Check if whatsapp and phone are same
       setSameAsPhone(
         member.phoneNumber === member.whatsappNumber &&
@@ -120,6 +149,8 @@ export default function MemberFormModal({
         otherSocieties: [],
       });
       setOtherSocietiesInput("");
+      setImagePreview(null);
+      setProfileImage(null);
       setSameAsPhone(false);
     }
     setErrors({});
@@ -279,7 +310,36 @@ export default function MemberFormModal({
     }
   };
 
-  const handleSubmit = () => {
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({ ...prev, image: "Please select an image file" }));
+      return;
+    }
+
+    setProfileImage(file);
+    setErrors((prev) => ({ ...prev, image: null }));
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setProfileImage(null);
+    setImagePreview(member?.profileImage || null);
+    setErrors((prev) => ({ ...prev, image: null }));
+  };
+
+  const handleSubmit = async () => {
     // Final validation before submit
     const newErrors = {};
 
@@ -331,14 +391,70 @@ export default function MemberFormModal({
       return;
     }
 
-    // Process other societies before saving
-    const societies = otherSocietiesInput
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s !== "");
+    setIsUploadingImage(true);
 
-    onSave({ ...formData, otherSocieties: societies });
-    onClose();
+    try {
+      // Upload image to Cloudinary if new image is selected
+      let profileImageUrl = formData.profileImage || null;
+
+      if (profileImage) {
+        const reader = new FileReader();
+        reader.readAsDataURL(profileImage);
+
+        await new Promise((resolve, reject) => {
+          reader.onload = async () => {
+            try {
+              const base64Image = reader.result;
+              const uploadResult = await uploadImage(base64Image);
+
+              if (uploadResult.success) {
+                profileImageUrl = uploadResult.url;
+
+                // Delete old image if updating
+                if (
+                  member?.profileImage &&
+                  member.profileImage !== profileImageUrl
+                ) {
+                  await deleteImage(member.profileImage);
+                }
+
+                resolve();
+              } else {
+                setErrors((prev) => ({
+                  ...prev,
+                  image: uploadResult.error || "Failed to upload image",
+                }));
+                reject(new Error(uploadResult.error));
+              }
+            } catch (error) {
+              setErrors((prev) => ({
+                ...prev,
+                image: "Failed to upload image",
+              }));
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+        });
+      }
+
+      // Process other societies before saving
+      const societies = otherSocietiesInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s !== "");
+
+      onSave({
+        ...formData,
+        otherSocieties: societies,
+        profileImage: profileImageUrl,
+      });
+      onClose();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const isFormValid = () => {
@@ -386,6 +502,60 @@ export default function MemberFormModal({
         </ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-4">
+            {/* Profile Picture Upload */}
+            <div className="flex flex-col items-center gap-4 p-4 bg-background-100/30 rounded-lg border border-primary/10">
+              <div className="relative">
+                <Avatar
+                  src={imagePreview}
+                  icon={<FaUser size={48} />}
+                  name={formData.name}
+                  className="w-32 h-32"
+                  color="primary"
+                  classNames={{
+                    base: "shrink-0 border-2 border-primary/30 shadow-lg shadow-primary/50",
+                    icon: "text-foreground/80",
+                  }}
+                />
+                {imagePreview && profileImage && (
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    color="danger"
+                    className="absolute -top-1 -right-1 min-w-6 h-6"
+                    onPress={handleRemoveImage}
+                  >
+                    <MdDelete size={16} />
+                  </Button>
+                )}
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <label htmlFor="profile-image" className="cursor-pointer">
+                  <Button
+                    as="span"
+                    color="primary"
+                    variant="flat"
+                    startContent={<FaCamera />}
+                    className="bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"
+                  >
+                    {imagePreview ? "Change Photo" : "Upload Photo"}
+                  </Button>
+                </label>
+                <input
+                  id="profile-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                {errors.image && (
+                  <p className="text-xs text-danger">{errors.image}</p>
+                )}
+                <p className="text-xs text-foreground/50">
+                  Supported formats: JPG, PNG, GIF, WebP
+                </p>
+              </div>
+            </div>
+
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -614,6 +784,40 @@ export default function MemberFormModal({
               </Autocomplete>
             </div>
 
+            {/* Special Role */}
+            <div className="grid grid-cols-1 gap-4">
+              <Select
+                label="Special Role"
+                placeholder="Select special role (optional)"
+                selectedKeys={
+                  formData.specialRole ? [formData.specialRole] : []
+                }
+                onSelectionChange={(keys) => {
+                  const value = Array.from(keys)[0];
+                  handleChange("specialRole", value || null);
+                }}
+                classNames={{
+                  label: "text-foreground/80",
+                  trigger:
+                    "bg-background-200/60 border border-primary/20 hover:border-primary/40 data-[hover=true]:bg-background-200/80",
+                  value: "text-foreground",
+                  popoverContent:
+                    "bg-background-200/95 backdrop-blur-md border border-primary/30",
+                }}
+              >
+                {formOptions.specialRoles.map((role) => (
+                  <SelectItem
+                    key={role.key}
+                    value={role.key}
+                    color="primary"
+                    variant="flat"
+                  >
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+
             {/* Contact Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -779,7 +983,7 @@ export default function MemberFormModal({
             color="danger"
             variant="flat"
             onPress={onClose}
-            isDisabled={isLoading}
+            isDisabled={isLoading || isUploadingImage}
             className="bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30"
           >
             Cancel
@@ -787,11 +991,15 @@ export default function MemberFormModal({
           <Button
             color="primary"
             onPress={handleSubmit}
-            isDisabled={!isFormValid() || isLoading}
-            isLoading={isLoading}
+            isDisabled={!isFormValid() || isLoading || isUploadingImage}
+            isLoading={isLoading || isUploadingImage}
             className="bg-primary text-background-200 font-semibold hover:bg-primary/90"
           >
-            {mode === "add" ? "Add Member" : "Save Changes"}
+            {isUploadingImage
+              ? "Uploading..."
+              : mode === "add"
+              ? "Add Member"
+              : "Save Changes"}
           </Button>
         </ModalFooter>
       </ModalContent>
