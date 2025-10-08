@@ -22,6 +22,16 @@ const userSchema = new mongoose.Schema(
       ],
     },
 
+    personalEmail: {
+      type: String,
+      unique: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email",
+      ],
+      default: null,
+    },
+
     // Profile Information
     profileImage: {
       type: String,
@@ -35,18 +45,25 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    // College Information
-    rollNumber: {
+    whatsappNumber: {
       type: String,
-      // required: [true, "Roll number is required"],
-      uppercase: true,
-      trim: true,
+      // required: [true, "WhatsApp number is required"],
+      match: [/^[0-9]{10}$/, "Please enter a valid 10-digit WhatsApp number"],
       default: null,
     },
-    department: {
-      type: String,
-      // required: [true, "Department is required"],
+
+    // College Information
+    rollNumber: {
+      type: Number,
+      // required: [true, "Roll number is required"],
       trim: true,
+      default: null,
+      unique: true,
+    },
+
+    branch: {
+      type: String,
+      // required: [true, "Branch is required"],
       default: null,
     },
 
@@ -58,17 +75,41 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    role: {
+    vertical: {
       type: String,
-      enum: ["admin", "member", "director", "deputy-director"],
-      default: "member",
+      default: null,
     },
 
-    // Society Information
-    joiningDate: {
-      type: Date,
-      // required: [true, "Joining date is required"],
+    subdomain: {
+      type: String,
       default: null,
+    },
+
+    specialRole: {
+      type: String,
+      enum: [
+        "president",
+        "vice-president",
+        "general-secretary",
+        "joint-secretary",
+        "director",
+        "deputy-director",
+        "cto",
+        "deputy-cto",
+        "cso",
+        "deputy-cso",
+        "lead",
+        "cco",
+        "deputy-cco",
+        null,
+      ],
+      default: null,
+    },
+
+    role: {
+      type: String,
+      enum: ["admin", "member"],
+      default: "member",
     },
 
     // Social Links (optional)
@@ -76,6 +117,11 @@ const userSchema = new mongoose.Schema(
       linkedin: String,
       github: String,
       instagram: String,
+    },
+
+    otherSocieties: {
+      type: [String],
+      default: [],
     },
   },
   {

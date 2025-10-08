@@ -11,7 +11,7 @@ import {
   Select,
   SelectItem,
 } from "@heroui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   yearOptions,
   branchOptions,
@@ -32,10 +32,26 @@ export default function MemberFormModal({
       year: "",
       branch: "",
       rollNo: "",
-      k1kBranch: "",
-      domain: "",
+      vertical: "",
+      subdomain: "",
     }
   );
+
+  // Update formData when member changes
+  React.useEffect(() => {
+    if (member) {
+      setFormData(member);
+    } else {
+      setFormData({
+        name: "",
+        year: "",
+        branch: "",
+        rollNo: "",
+        vertical: "",
+        subdomain: "",
+      });
+    }
+  }, [member, isOpen]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -52,8 +68,8 @@ export default function MemberFormModal({
       formData.year &&
       formData.branch &&
       formData.rollNo &&
-      formData.k1kBranch &&
-      formData.domain
+      formData.vertical &&
+      formData.subdomain
     );
   };
 
@@ -85,7 +101,7 @@ export default function MemberFormModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Full Name"
-              placeholder="Enter full name"
+              placeholder={member?.name || "Enter full name"}
               value={formData.name}
               onValueChange={(value) => handleChange("name", value)}
               classNames={{
@@ -99,7 +115,7 @@ export default function MemberFormModal({
 
             <Select
               label="Year"
-              placeholder="Select year"
+              placeholder={member?.year || "Select year"}
               selectedKeys={formData.year ? [formData.year] : []}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0];
@@ -128,7 +144,7 @@ export default function MemberFormModal({
 
             <Select
               label="Branch"
-              placeholder="Select branch"
+              placeholder={member?.branch || "Select branch"}
               selectedKeys={formData.branch ? [formData.branch] : []}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0];
@@ -157,7 +173,7 @@ export default function MemberFormModal({
 
             <Input
               label="Roll Number"
-              placeholder="Enter roll number"
+              placeholder={member?.rollNo || "Enter roll number"}
               value={formData.rollNo}
               onValueChange={(value) => handleChange("rollNo", value)}
               classNames={{
@@ -170,12 +186,12 @@ export default function MemberFormModal({
             />
 
             <Select
-              label="K1K Branch"
-              placeholder="Select K1K branch"
-              selectedKeys={formData.k1kBranch ? [formData.k1kBranch] : []}
+              label="Vertical / Team"
+              placeholder={member?.vertical || "Select vertical"}
+              selectedKeys={formData.vertical ? [formData.vertical] : []}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0];
-                handleChange("k1kBranch", value);
+                handleChange("vertical", value);
               }}
               classNames={{
                 label: "text-foreground/80",
@@ -199,12 +215,12 @@ export default function MemberFormModal({
             </Select>
 
             <Select
-              label="Domain"
-              placeholder="Select domain"
-              selectedKeys={formData.domain ? [formData.domain] : []}
+              label="Sub Domain"
+              placeholder={member?.subdomain || "Select subdomain"}
+              selectedKeys={formData.subdomain ? [formData.subdomain] : []}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0];
-                handleChange("domain", value);
+                handleChange("subdomain", value);
               }}
               classNames={{
                 label: "text-foreground/80",

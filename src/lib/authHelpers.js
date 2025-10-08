@@ -30,22 +30,32 @@ export async function createOrGetUser(userData) {
     }
 
     console.log("Creating new user...");
-    // Create new user
+    // Extract roll number from email (part before @)
+    const rollNumberFromEmail = userData.email.split("@")[0];
+
+    // Create new user with updated schema
     const newUser = await User.create({
       name: userData.name,
       email: userData.email,
-      profileImage: userData.image.replace("=s96-c", ""),
+      personalEmail: null,
+      profileImage: userData.image
+        ? userData.image.replace("=s96-c", "")
+        : null,
       role: "member",
       phoneNumber: null,
-      rollNumber: null,
-      department: null,
+      whatsappNumber: null,
+      rollNumber: rollNumberFromEmail,
+      branch: null,
       year: null,
-      joiningDate: null,
+      vertical: null,
+      subdomain: null,
+      specialRole: null,
       socialLinks: {
         linkedin: "",
         github: "",
         instagram: "",
       },
+      otherSocieties: [],
     });
 
     console.log("User created successfully:", newUser.email);

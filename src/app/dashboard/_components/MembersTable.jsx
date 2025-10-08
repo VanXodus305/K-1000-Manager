@@ -13,7 +13,14 @@ import {
   Chip,
   Pagination,
 } from "@heroui/react";
-import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2, FiEye } from "react-icons/fi";
+import localFont from "next/font/local";
+
+const conthrax = localFont({
+  src: "../../../../public/fonts/Conthrax-SemiBold.otf",
+  variable: "--font-conthrax",
+  display: "swap",
+});
 
 export default function MembersTable({
   members,
@@ -22,6 +29,7 @@ export default function MembersTable({
   sortDescriptor,
   setSortDescriptor,
   onEdit,
+  onView,
 }) {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 5;
@@ -40,7 +48,12 @@ export default function MembersTable({
     switch (columnKey) {
       case "name":
         return (
-          <span className="text-foreground font-medium">{member.name}</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-foreground font-medium">{member.name}</span>
+            <span className="text-secondary/80 text-xs">
+              {member.rollNo}@kiit.ac.in
+            </span>
+          </div>
         );
       case "year":
         return <span className="text-foreground/80">{member.year}</span>;
@@ -62,15 +75,26 @@ export default function MembersTable({
         return <span className="text-foreground/80">{member.subdomain}</span>;
       case "actions":
         return (
-          <Button
-            isIconOnly
-            size="sm"
-            variant="light"
-            onPress={() => onEdit(member)}
-            className="text-foreground/60 hover:text-primary hover:bg-primary/10"
-          >
-            <FiEdit2 size={16} />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => onView(member)}
+              className="text-foreground/60 hover:text-primary hover:bg-primary/10"
+            >
+              <FiEye size={16} />
+            </Button>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => onEdit(member)}
+              className="text-foreground/60 hover:text-primary hover:bg-primary/10"
+            >
+              <FiEdit2 size={16} />
+            </Button>
+          </div>
         );
       default:
         return null;
@@ -151,7 +175,7 @@ export default function MembersTable({
           <TableColumn
             key={column.key}
             allowsSorting={column.sortable}
-            className="text-left"
+            className={`text-left ${conthrax.className} text-[13px]`}
           >
             {column.label}
           </TableColumn>

@@ -47,23 +47,31 @@ export async function checkIfUserExists() {
 
     console.log("Creating new user...");
     const { user } = session;
+    // Extract roll number from email (part before @)
+    const rollNumberFromEmail = user.email.split("@")[0];
+
     const data = {
       name: user.name,
       email: user.email,
-      profileImage: user.image.replace("=s96-c", ""), // Higher res image
+      personalEmail: null,
+      profileImage: user.image ? user.image.replace("=s96-c", "") : null, // Higher res image
       role: "member", // Default role for new users
 
       phoneNumber: null,
-      rollNumber: null,
-      department: null,
+      whatsappNumber: null,
+      rollNumber: rollNumberFromEmail,
+      branch: null,
       year: null,
-      joiningDate: null,
+      vertical: null,
+      subdomain: null,
+      specialRole: null,
 
       socialLinks: {
         linkedin: "",
         github: "",
         instagram: "",
       },
+      otherSocieties: [],
     };
     const newUser = await User.create(data);
     console.log("User created successfully:", newUser.email);

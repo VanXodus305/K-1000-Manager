@@ -5,6 +5,7 @@ import TableHeader from "./TableHeader";
 import MembersTable from "./MembersTable";
 import MemberFormModal from "./MemberFormModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import ViewMemberModal from "./ViewMemberModal";
 import { dummyMembers } from "@/lib/dummyData";
 
 export default function DashboardContent() {
@@ -21,7 +22,9 @@ export default function DashboardContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
+  const [viewingMember, setViewingMember] = useState(null);
 
   // Filter and search members
   const filteredMembers = useMemo(() => {
@@ -82,6 +85,12 @@ export default function DashboardContent() {
     setIsEditModalOpen(true);
   };
 
+  // Open view modal with member data
+  const openViewModal = (member) => {
+    setViewingMember(member);
+    setIsViewModalOpen(true);
+  };
+
   const selectedCount =
     selectedKeys === "all" ? members.length : selectedKeys.size;
 
@@ -104,6 +113,7 @@ export default function DashboardContent() {
         sortDescriptor={sortDescriptor}
         setSortDescriptor={setSortDescriptor}
         onEdit={openEditModal}
+        onView={openViewModal}
       />
 
       {/* Add Member Modal */}
@@ -132,6 +142,16 @@ export default function DashboardContent() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteSelected}
         count={selectedCount}
+      />
+
+      {/* View Member Modal */}
+      <ViewMemberModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setViewingMember(null);
+        }}
+        member={viewingMember}
       />
     </div>
   );
