@@ -1,7 +1,8 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/utils/auth";
-import { getUserFromDB } from "@/lib/getUser";
+import { getUserFromDB } from "@/actions/userActions";
+import { getAllMembers } from "@/actions/memberActions";
 import DashboardContent from "./_components/DashboardContent";
 import AccessDenied from "./_components/AccessDenied";
 
@@ -20,5 +21,8 @@ export default async function Dashboard() {
     return <AccessDenied />;
   }
 
-  return <DashboardContent />;
+  // Fetch all members from database
+  const { members } = await getAllMembers();
+
+  return <DashboardContent initialMembers={members} />;
 }

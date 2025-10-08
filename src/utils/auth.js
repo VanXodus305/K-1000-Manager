@@ -12,7 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === "google") {
         try {
           // Dynamically import the helper to avoid Edge runtime issues
-          const { createOrGetUser } = await import("@/lib/authHelpers");
+          const { createOrGetUser } = await import("@/actions/authActions");
           await createOrGetUser(user);
           return true;
         } catch (error) {

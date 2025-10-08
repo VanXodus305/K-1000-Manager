@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import TableHeader from "./TableHeader";
 import MembersTable from "./MembersTable";
 import MemberFormModal from "./MemberFormModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import ViewMemberModal from "./ViewMemberModal";
-import { dummyMembers } from "@/lib/dummyData";
+import {
+  addMember,
+  updateMember,
+  deleteMembers,
+} from "@/actions/memberActions";
 
-export default function DashboardContent() {
-  const [members, setMembers] = useState(dummyMembers);
+export default function DashboardContent({ initialMembers = [] }) {
+  const router = useRouter();
+  const [members, setMembers] = useState(initialMembers);
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [searchValue, setSearchValue] = useState("");
   const [filterBy, setFilterBy] = useState(new Set([]));
@@ -25,6 +31,7 @@ export default function DashboardContent() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [viewingMember, setViewingMember] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filter and search members
   const filteredMembers = useMemo(() => {
@@ -34,10 +41,13 @@ export default function DashboardContent() {
     if (searchValue) {
       filtered = filtered.filter(
         (member) =>
-          member.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          member.rollNo.toLowerCase().includes(searchValue.toLowerCase()) ||
-          member.branch.toLowerCase().includes(searchValue.toLowerCase()) ||
-          member.subdomain.toLowerCase().includes(searchValue.toLowerCase())
+          member.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+          member.rollNo
+            ?.toString()
+            .toLowerCase()
+            .includes(searchValue.toLowerCase()) ||
+          member.branch?.toLowerCase().includes(searchValue.toLowerCase()) ||
+          member.subdomain?.toLowerCase().includes(searchValue.toLowerCase())
       );
     }
 
@@ -46,7 +56,7 @@ export default function DashboardContent() {
       const filterArray = Array.from(filterBy);
       filtered = filtered.filter((member) =>
         filterArray.some(
-          (filter) => member.vertical.toLowerCase() === filter.toLowerCase()
+          (filter) => member.vertical?.toLowerCase() === filter.toLowerCase()
         )
       );
     }
@@ -55,28 +65,78 @@ export default function DashboardContent() {
   }, [members, searchValue, filterBy]);
 
   // Handle add member
-  const handleAddMember = (newMember) => {
-    const memberWithId = {
-      ...newMember,
-      id: (members.length + 1).toString(),
-    };
-    setMembers([...members, memberWithId]);
+  const handleAddMember = async (newMemberData) => {
+    setIsLoading(true);
+    try {
+      const result = await addMember(newMemberData);
+      if (result.success) {
+        router.refresh();
+        // Optimistically update UI
+        setMembers([...members, result.member]);
+      } else {
+        console.error("Error adding member:", result.error);
+        alert("Failed to add member: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error adding member:", error);
+      alert("Failed to add member");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle edit member
-  const handleEditMember = (updatedMember) => {
-    setMembers(
-      members.map((member) =>
-        member.id === updatedMember.id ? updatedMember : member
-      )
-    );
+  const handleEditMember = async (updatedMemberData) => {
+    setIsLoading(true);
+    try {
+      const result = await updateMember(
+        updatedMemberData.id,
+        updatedMemberData
+      );
+      if (result.success) {
+        router.refresh();
+        // Optimistically update UI
+        setMembers(
+          members.map((member) =>
+            member.id === updatedMemberData.id ? result.member : member
+          )
+        );
+      } else {
+        console.error("Error updating member:", result.error);
+        alert("Failed to update member: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error updating member:", error);
+      alert("Failed to update member");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle delete selected members
-  const handleDeleteSelected = () => {
-    const selectedArray = Array.from(selectedKeys);
-    setMembers(members.filter((member) => !selectedArray.includes(member.id)));
-    setSelectedKeys(new Set([]));
+  const handleDeleteSelected = async () => {
+    setIsLoading(true);
+    try {
+      const selectedArray = Array.from(selectedKeys);
+      const result = await deleteMembers(selectedArray);
+      if (result.success) {
+        router.refresh();
+        // Optimistically update UI
+        setMembers(
+          members.filter((member) => !selectedArray.includes(member.id))
+        );
+        setSelectedKeys(new Set([]));
+      } else {
+        console.error("Error deleting members:", result.error);
+        alert("Failed to delete members: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error deleting members:", error);
+      alert("Failed to delete members");
+    } finally {
+      setIsLoading(false);
+      setIsDeleteModalOpen(false);
+    }
   };
 
   // Open edit modal with member data
@@ -122,6 +182,7 @@ export default function DashboardContent() {
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddMember}
         mode="add"
+        isLoading={isLoading}
       />
 
       {/* Edit Member Modal */}
@@ -134,6 +195,7 @@ export default function DashboardContent() {
         onSave={handleEditMember}
         member={editingMember}
         mode="edit"
+        isLoading={isLoading}
       />
 
       {/* Delete Confirmation Modal */}
@@ -142,6 +204,7 @@ export default function DashboardContent() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteSelected}
         count={selectedCount}
+        isLoading={isLoading}
       />
 
       {/* View Member Modal */}

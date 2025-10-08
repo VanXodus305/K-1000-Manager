@@ -2,7 +2,7 @@
 
 import mongoose from "mongoose";
 import { redirect } from "next/navigation";
-import User from "@/lib/models/userModel";
+import User from "../../models/userModel";
 import { auth, signIn, signOut } from "@/utils/auth";
 
 const MONGODB_URI = process.env.MONGODB_URI;

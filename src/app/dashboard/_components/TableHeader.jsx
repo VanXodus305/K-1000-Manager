@@ -22,11 +22,21 @@ export default function TableHeader({
   onAddMember,
 }) {
   const filterOptions = [
-    { key: "core", label: "Core" },
-    { key: "technical", label: "Technical" },
-    { key: "management", label: "Management" },
-    { key: "content", label: "Content" },
-    { key: "design", label: "Design" },
+    { key: "operations", label: "Operations" },
+    { key: "otg", label: "OTG" },
+    { key: "osg", label: "OSG" },
+    { key: "ocd", label: "OCD" },
+    { key: "public relations", label: "Public Relations" },
+    { key: "campus ambassadors", label: "Campus Ambassadors" },
+    {
+      key: "academic & internship guidance",
+      label: "Academic & Internship Guidance",
+    },
+    { key: "research & publications", label: "Research & Publications" },
+    { key: "training program", label: "Training Program" },
+    { key: "higher studies", label: "Higher Studies" },
+    { key: "project wing", label: "Project Wing" },
+    { key: "event management", label: "Event Management" },
   ];
 
   return (
@@ -68,6 +78,7 @@ export default function TableHeader({
         <div className="w-full md:w-96">
           <Input
             placeholder="Search in table"
+            isClearable
             value={searchValue}
             onValueChange={onSearchChange}
             startContent={<FiSearch className="text-foreground/50" size={18} />}
@@ -87,22 +98,25 @@ export default function TableHeader({
             // placeholder="Select vertical / team"
             selectionMode="multiple"
             selectedKeys={filterBy}
+            isClearable
+            color="primary"
             onSelectionChange={onFilterChange}
             classNames={{
               base: "w-full md:w-56",
               trigger:
-                "h-12 bg-background-200/60 backdrop-blur-md border border-primary/20 hover:border-primary/40 data-[hover=true]:bg-background-200/80",
+                "h-12 bg-background-200/60 backdrop-blur-sm border border-primary/20 hover:border-primary/40 data-[hover=true]:bg-background-200/80",
               label: "text-foreground/70 text-sm",
               value: "text-foreground text-sm",
               popoverContent:
-                "bg-background-200/95 backdrop-blur-md border border-primary/30",
+                "bg-background-200/95 backdrop-blur-sm border border-primary/30",
             }}
           >
             {filterOptions.map((option) => (
               <SelectItem
                 key={option.key}
                 value={option.key}
-                className="text-foreground hover:bg-primary/20"
+                color="primary"
+                variant="flat"
               >
                 {option.label}
               </SelectItem>

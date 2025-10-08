@@ -8,37 +8,85 @@ import {
   ModalFooter,
   Button,
   Chip,
+  Divider,
 } from "@heroui/react";
-import { MdEmail, MdPerson, MdSchool } from "react-icons/md";
-import { FaIdCard, FaCalendarAlt } from "react-icons/fa";
+import { MdEmail, MdPerson, MdSchool, MdPhone } from "react-icons/md";
+import {
+  FaIdCard,
+  FaCalendarAlt,
+  FaLinkedin,
+  FaGithub,
+  FaInstagram,
+  FaWhatsapp,
+} from "react-icons/fa";
 import { BiSolidBriefcase } from "react-icons/bi";
 
 export default function ViewMemberModal({ isOpen, onClose, member }) {
   if (!member) return null;
 
-  const InfoRow = ({ icon: Icon, label, value, isPrimary = false }) => (
-    <div className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5">
-      <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shrink-0">
+  const InfoRow = ({ icon: Icon, label, value, isPrimary = false }) => {
+    // Don't render if value is empty, null, or undefined
+    if (
+      !value ||
+      value === "" ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      return null;
+    }
+
+    return (
+      <div className="flex items-center gap-3 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5">
+        <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shrink-0">
+          <Icon className="text-primary" size={18} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-foreground/60 mb-0.5">{label}</p>
+          {isPrimary ? (
+            <Chip
+              size="sm"
+              variant="flat"
+              className="bg-primary/20 text-primary border border-primary/30"
+            >
+              {value}
+            </Chip>
+          ) : Array.isArray(value) ? (
+            <div className="flex flex-wrap gap-1">
+              {value.map((item, index) => (
+                <Chip
+                  key={index}
+                  size="sm"
+                  variant="flat"
+                  className="bg-secondary/20 text-foreground border border-secondary/30"
+                >
+                  {item}
+                </Chip>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-foreground font-medium truncate">
+              {value}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const SocialLink = ({ icon: Icon, label, url }) => {
+    if (!url || url === "") return null;
+
+    return (
+      <a
+        href={url.startsWith("http") ? url : `https://${url}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 bg-background-100/30 rounded-lg border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors"
+      >
         <Icon className="text-primary" size={18} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-foreground/60 mb-0.5">{label}</p>
-        {isPrimary ? (
-          <Chip
-            size="sm"
-            variant="flat"
-            className="bg-primary/20 text-primary border border-primary/30"
-          >
-            {value}
-          </Chip>
-        ) : (
-          <p className="text-sm text-foreground font-medium truncate">
-            {value}
-          </p>
-        )}
-      </div>
-    </div>
-  );
+        <span className="text-sm text-foreground font-medium">{label}</span>
+      </a>
+    );
+  };
 
   return (
     <Modal
@@ -63,13 +111,22 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
         </ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-3">
+            {/* Basic Information */}
             <InfoRow icon={MdPerson} label="Full Name" value={member.name} />
 
             <InfoRow
               icon={MdEmail}
-              label="Email Address"
-              value={`${member.rollNo}@kiit.ac.in`}
+              label="College Email"
+              value={member.email}
             />
+
+            {member.personalEmail && (
+              <InfoRow
+                icon={MdEmail}
+                label="Personal Email"
+                value={member.personalEmail}
+              />
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <InfoRow
@@ -87,20 +144,106 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               value={member.rollNo}
             />
 
+            {/* K-1000 Information */}
+            <Divider className="my-2" />
+            <h3 className="text-sm font-semibold text-primary">
+              K-1000 Details
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {member.vertical && (
+                <InfoRow
+                  icon={BiSolidBriefcase}
+                  label="Vertical / Team"
+                  value={member.vertical}
+                  isPrimary={true}
+                />
+              )}
+
+              {member.subdomain && (
+                <InfoRow
+                  icon={BiSolidBriefcase}
+                  label="Sub Domain"
+                  value={member.subdomain}
+                />
+              )}
+            </div>
+
+            {member.specialRole && (
               <InfoRow
                 icon={BiSolidBriefcase}
-                label="Vertical / Team"
-                value={member.vertical}
+                label="Special Role"
+                value={member.specialRole}
                 isPrimary={true}
               />
+            )}
 
-              <InfoRow
-                icon={BiSolidBriefcase}
-                label="Sub Domain"
-                value={member.subdomain}
-              />
-            </div>
+            {/* Contact Information */}
+            {(member.phoneNumber || member.whatsappNumber) && (
+              <>
+                <Divider className="my-2" />
+                <h3 className="text-sm font-semibold text-primary">Contact</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {member.phoneNumber && (
+                    <InfoRow
+                      icon={MdPhone}
+                      label="Phone Number"
+                      value={member.phoneNumber}
+                    />
+                  )}
+
+                  {member.whatsappNumber && (
+                    <InfoRow
+                      icon={FaWhatsapp}
+                      label="WhatsApp Number"
+                      value={member.whatsappNumber}
+                    />
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Social Links */}
+            {(member.socialLinks?.linkedin ||
+              member.socialLinks?.github ||
+              member.socialLinks?.instagram) && (
+              <>
+                <Divider className="my-2" />
+                <h3 className="text-sm font-semibold text-primary mb-1">
+                  Social Links
+                </h3>
+                <div className="flex flex-col gap-2">
+                  <SocialLink
+                    icon={FaLinkedin}
+                    label="LinkedIn"
+                    url={member.socialLinks?.linkedin}
+                  />
+                  <SocialLink
+                    icon={FaGithub}
+                    label="GitHub"
+                    url={member.socialLinks?.github}
+                  />
+                  <SocialLink
+                    icon={FaInstagram}
+                    label="Instagram"
+                    url={member.socialLinks?.instagram}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Other Societies */}
+            {member.otherSocieties && member.otherSocieties.length > 0 && (
+              <>
+                <Divider className="my-2" />
+                <InfoRow
+                  icon={BiSolidBriefcase}
+                  label="Other Societies"
+                  value={member.otherSocieties}
+                />
+              </>
+            )}
           </div>
         </ModalBody>
         <ModalFooter>

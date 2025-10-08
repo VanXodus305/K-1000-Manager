@@ -1,7 +1,7 @@
 "use server";
 
 import mongoose from "mongoose";
-import User from "@/lib/models/userModel";
+import User from "../models/userModel";
 import { auth } from "@/utils/auth";
 
 const MONGODB_URI = process.env.MONGODB_URI;

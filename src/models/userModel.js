@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema(
 
     personalEmail: {
       type: String,
-      unique: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please enter a valid email",
@@ -77,6 +76,21 @@ const userSchema = new mongoose.Schema(
 
     vertical: {
       type: String,
+      enum: [
+        "Operations",
+        "OTG",
+        "OSG",
+        "OCD",
+        "Public Relations",
+        "Campus Ambassadors",
+        "Academic & Internship Guidance",
+        "Research & Publications",
+        "Training Program",
+        "Higher Studies",
+        "Project Wing",
+        "Event Management",
+        null,
+      ],
       default: null,
     },
 

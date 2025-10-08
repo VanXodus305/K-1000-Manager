@@ -40,7 +40,7 @@ export default function MembersTable({
     { key: "branch", label: "Branch", sortable: true },
     { key: "rollNo", label: "Roll no.", sortable: true },
     { key: "vertical", label: "Vertical / Team", sortable: false },
-    { key: "subdomain", label: "Sub Domain", sortable: false },
+    { key: "subdomain", label: "Domain", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -48,21 +48,22 @@ export default function MembersTable({
     switch (columnKey) {
       case "name":
         return (
-          <div className="flex flex-col gap-1">
-            <span className="text-foreground font-medium">{member.name}</span>
-            <span className="text-secondary/80 text-xs">
-              {member.rollNo}@kiit.ac.in
-            </span>
-          </div>
+          <span className="text-foreground font-medium">
+            {member.name || "-"}
+          </span>
         );
       case "year":
-        return <span className="text-foreground/80">{member.year}</span>;
+        return <span className="text-foreground/80">{member.year || "-"}</span>;
       case "branch":
-        return <span className="text-foreground/80">{member.branch}</span>;
-      case "rollNo":
-        return <span className="text-foreground/80">{member.rollNo}</span>;
-      case "vertical":
         return (
+          <span className="text-foreground/80">{member.branch || "-"}</span>
+        );
+      case "rollNo":
+        return (
+          <span className="text-foreground/80">{member.rollNo || "-"}</span>
+        );
+      case "vertical":
+        return member.vertical ? (
           <Chip
             size="sm"
             variant="flat"
@@ -70,9 +71,13 @@ export default function MembersTable({
           >
             {member.vertical}
           </Chip>
+        ) : (
+          <span className="text-foreground/40">-</span>
         );
       case "subdomain":
-        return <span className="text-foreground/80">{member.subdomain}</span>;
+        return (
+          <span className="text-foreground/80">{member.subdomain || "-"}</span>
+        );
       case "actions":
         return (
           <div className="flex items-center gap-2">
