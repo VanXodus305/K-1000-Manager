@@ -82,20 +82,20 @@ export default function GlobalNavbar() {
                       {session.user.email}
                     </p>
                   </DropdownItem>
-                  <DropdownItem
+                  {/* <DropdownItem
                     key="settings"
                     className="text-foreground"
                     textValue="Settings"
                   >
                     Settings
-                  </DropdownItem>
-                  <DropdownItem
+                  </DropdownItem> */}
+                  {/* <DropdownItem
                     key="help"
                     className="text-foreground"
                     textValue="Help & Support"
                   >
                     Help & Support
-                  </DropdownItem>
+                  </DropdownItem> */}
                   <DropdownItem
                     key="logout"
                     color="danger"
