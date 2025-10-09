@@ -62,7 +62,7 @@ export default function MemberFormModal({
     branches: [],
     verticals: [
       "Operations",
-      "OTG",
+      "OTI",
       "OSG",
       "OCD",
       "Public Relations",

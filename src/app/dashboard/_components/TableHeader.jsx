@@ -23,7 +23,7 @@ export default function TableHeader({
 }) {
   const filterOptions = [
     { key: "operations", label: "Operations" },
-    { key: "otg", label: "OTG" },
+    { key: "oti", label: "OTI" },
     { key: "osg", label: "OSG" },
     { key: "ocd", label: "OCD" },
     { key: "public relations", label: "Public Relations" },

@@ -265,7 +265,7 @@ export async function getFormOptions() {
     // Vertical options from the model enum
     const verticalOptions = [
       "Operations",
-      "OTG",
+      "OTI",
       "OSG",
       "OCD",
       "Public Relations",
@@ -297,7 +297,7 @@ export async function getFormOptions() {
         branches: [],
         verticals: [
           "Operations",
-          "OTG",
+          "OTI",
           "OSG",
           "OCD",
           "Public Relations",

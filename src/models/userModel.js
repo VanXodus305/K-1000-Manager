@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Operations",
-        "OTG",
+        "OTI",
         "OSG",
         "OCD",
         "Public Relations",

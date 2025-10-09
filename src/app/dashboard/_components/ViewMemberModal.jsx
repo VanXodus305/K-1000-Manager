@@ -29,10 +29,25 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
   // Helper function to format special role
   const formatSpecialRole = (role) => {
     if (!role) return null;
-    return role
+
+    // Handle special cases for acronyms
+    const formatted = role
       .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => {
+        // Keep CTO, CCO, CSO as all caps
+        if (
+          word.toLowerCase() === "cto" ||
+          word.toLowerCase() === "cco" ||
+          word.toLowerCase() === "cso"
+        ) {
+          return word.toUpperCase();
+        }
+        // Title case for other words
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
       .join(" ");
+
+    return formatted;
   };
 
   const InfoRow = ({
