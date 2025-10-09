@@ -44,7 +44,7 @@ export default function MembersTable({
   onView,
 }) {
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const columns = [
     { key: "name", label: "Name", sortable: true },
@@ -278,72 +278,73 @@ export default function MembersTable({
   }, [page, sortedMembers, rowsPerPage]);
 
   return (
-    <Table
-      aria-label="Members table"
-      selectionMode="multiple"
-      color="primary"
-      selectedKeys={selectedKeys}
-      onSelectionChange={setSelectedKeys}
-      sortDescriptor={sortDescriptor}
-      onSortChange={setSortDescriptor}
-      bottomContent={
-        pages > 1 ? (
-          <div className="flex w-full justify-center">
-            <Pagination
-              showControls
-              loop
-              showShadow
-              color="primary"
-              page={page}
-              total={pages}
-              onChange={(page) => setPage(page)}
-              classNames={{
-                base: "mt-2 pb-5",
-                item: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground",
-                cursor:
-                  "bg-primary text-background-200 font-semibold shadow-lg",
-                prev: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground hover:bg-primary/20",
-                next: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground hover:bg-primary/20",
-              }}
-            />
-          </div>
-        ) : null
-      }
-      classNames={{
-        base: "max-h-[calc(100vh-150px)]",
-        wrapper:
-          "bg-background-200/60 backdrop-blur-md border border-primary/20 rounded-xl shadow-lg",
-        th: "bg-primary/80 text-background-200 font-semibold text-sm first:rounded-tl-lg last:rounded-tr-lg data-[hover=true]:text-secondary",
-        td: "text-foreground/90",
-        tr: "data-[selected=true]:bg-transparent data-[odd=true]:bg-secondary/10 transition-colors border-b border-primary/10 last:border-b-0",
-      }}
-      checkboxesProps={{
-        classNames: {
+    <>
+      <Table
+        aria-label="Members table"
+        selectionMode="multiple"
+        color="primary"
+        selectedKeys={selectedKeys}
+        onSelectionChange={setSelectedKeys}
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
+        classNames={{
+          base: "max-h-[calc(100vh-150px)]",
           wrapper:
-            "after:bg-primary after:border-background-200 before:border-primary group-data-[selected=true]:border-background-200",
-        },
-      }}
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.key}
-            allowsSorting={column.sortable}
-            className={`text-left ${conthrax.className} text-[13px]`}
-          >
-            {column.label}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody items={paginatedMembers} emptyContent="No members found">
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+            "bg-background-200/60 backdrop-blur-md border border-primary/20 rounded-xl shadow-lg",
+          th: "bg-primary/80 text-background-200 font-semibold text-sm first:rounded-tl-lg last:rounded-tr-lg data-[hover=true]:text-secondary",
+          td: "text-foreground/90",
+          tr: "data-[selected=true]:bg-transparent data-[odd=true]:bg-secondary/10 transition-colors border-b border-primary/10 last:border-b-0",
+        }}
+        checkboxesProps={{
+          classNames: {
+            wrapper:
+              "after:bg-primary after:border-background-200 before:border-primary group-data-[selected=true]:border-background-200",
+          },
+        }}
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              allowsSorting={column.sortable}
+              className={`text-left ${conthrax.className} text-[13px]`}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={paginatedMembers} emptyContent="No members found">
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      {/* Pagination outside table */}
+      {pages > 1 && (
+        <div className="flex w-full justify-center mt-4">
+          <Pagination
+            showControls
+            loop
+            showShadow
+            color="primary"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+            classNames={{
+              item: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground",
+              cursor: "bg-primary text-background-200 font-semibold shadow-lg",
+              prev: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground hover:bg-primary/20",
+              next: "bg-background-200/60 backdrop-blur-md border border-primary/20 text-foreground hover:bg-primary/20",
+              base: "pb-5",
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 }
