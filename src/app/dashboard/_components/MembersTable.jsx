@@ -58,7 +58,7 @@ export default function MembersTable({
     { key: "branch", label: "Branch", sortable: true },
     { key: "rollNo", label: "Roll no.", sortable: true },
     { key: "vertical", label: "Vertical / Team", sortable: false },
-    { key: "subdomain", label: "Domain", sortable: false },
+    { key: "subdomain", label: "Sub Domain", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
 
