@@ -47,6 +47,11 @@ export default function MembersTable({
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
+  // Reset page to 1 when members array changes (search/filter applied)
+  React.useEffect(() => {
+    setPage(1);
+  }, [members]);
+
   const columns = [
     { key: "name", label: "Name", sortable: true },
     { key: "year", label: "Year", sortable: true },
