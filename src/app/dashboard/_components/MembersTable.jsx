@@ -12,6 +12,7 @@ import {
   Chip,
   Pagination,
   Avatar,
+  Tooltip,
 } from "@heroui/react";
 import { FiEdit2, FiEye } from "react-icons/fi";
 import {
@@ -55,6 +56,26 @@ export default function MembersTable({
     { key: "subdomain", label: "Domain", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
+
+  // Helper function to get full form of vertical abbreviations
+  const getVerticalTooltip = (vertical) => {
+    const tooltips = {
+      OTI: "Office of Technology & Innovation",
+      OSG: "Office of Strategy & Growth",
+      OCD: "Office of Creativity & Design",
+    };
+    return tooltips[vertical] || null;
+  };
+
+  // Helper function to get full form of role abbreviations
+  const getRoleTooltip = (role) => {
+    const tooltips = {
+      CTO: "Chief Technology Officer",
+      CCO: "Chief Creative Officer",
+      CSO: "Chief Strategy Officer",
+    };
+    return tooltips[role] || null;
+  };
 
   // Helper function to format special role
   const formatSpecialRole = (role) => {
@@ -201,18 +222,45 @@ export default function MembersTable({
               <span className="text-foreground font-medium">
                 {member.name || "-"}
               </span>
-              {member.specialRole && roleConfig && (
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  startContent={
-                    RoleIcon && <RoleIcon className="ml-1" size={12} />
-                  }
-                  className={`${roleConfig.bgColor} ${roleConfig.textColor} border ${roleConfig.borderColor} font-semibold w-fit`}
-                >
-                  {formatSpecialRole(member.specialRole)}
-                </Chip>
-              )}
+              {member.specialRole &&
+                roleConfig &&
+                (() => {
+                  const formattedRole = formatSpecialRole(member.specialRole);
+                  const roleWords = formattedRole.split(" ");
+                  const hasAcronym = roleWords.some(
+                    (word) => word === "CTO" || word === "CCO" || word === "CSO"
+                  );
+                  const acronym = roleWords.find(
+                    (word) => word === "CTO" || word === "CCO" || word === "CSO"
+                  );
+                  const roleTooltip = acronym ? getRoleTooltip(acronym) : null;
+
+                  return roleTooltip ? (
+                    <Tooltip content={roleTooltip} delay={300}>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        startContent={
+                          RoleIcon && <RoleIcon className="ml-1" size={12} />
+                        }
+                        className={`${roleConfig.bgColor} ${roleConfig.textColor} border ${roleConfig.borderColor} font-semibold w-fit cursor-help`}
+                      >
+                        {formattedRole}
+                      </Chip>
+                    </Tooltip>
+                  ) : (
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      startContent={
+                        RoleIcon && <RoleIcon className="ml-1" size={12} />
+                      }
+                      className={`${roleConfig.bgColor} ${roleConfig.textColor} border ${roleConfig.borderColor} font-semibold w-fit`}
+                    >
+                      {formattedRole}
+                    </Chip>
+                  );
+                })()}
             </div>
           </div>
         );
@@ -227,14 +275,30 @@ export default function MembersTable({
           <span className="text-foreground/80">{member.rollNo || "-"}</span>
         );
       case "vertical":
+        const verticalTooltip = member.vertical
+          ? getVerticalTooltip(member.vertical)
+          : null;
+
         return member.vertical ? (
-          <Chip
-            size="sm"
-            variant="flat"
-            className="bg-primary/20 text-primary border border-primary/30"
-          >
-            {member.vertical}
-          </Chip>
+          verticalTooltip ? (
+            <Tooltip content={verticalTooltip} delay={300}>
+              <Chip
+                size="sm"
+                variant="flat"
+                className="bg-primary/20 text-primary border border-primary/30 cursor-help"
+              >
+                {member.vertical}
+              </Chip>
+            </Tooltip>
+          ) : (
+            <Chip
+              size="sm"
+              variant="flat"
+              className="bg-primary/20 text-primary border border-primary/30"
+            >
+              {member.vertical}
+            </Chip>
+          )
         ) : (
           <span className="text-foreground/40">-</span>
         );
@@ -245,24 +309,28 @@ export default function MembersTable({
       case "actions":
         return (
           <div className="flex items-center gap-2">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              onPress={() => onView(member)}
-              className="text-foreground/60 hover:text-primary hover:bg-primary/10"
-            >
-              <FiEye size={16} />
-            </Button>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              onPress={() => onEdit(member)}
-              className="text-foreground/60 hover:text-primary hover:bg-primary/10"
-            >
-              <FiEdit2 size={16} />
-            </Button>
+            <Tooltip content="View Details" showArrow delay={500}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => onView(member)}
+                className="text-foreground/60 hover:text-primary hover:bg-primary/10"
+              >
+                <FiEye size={16} />
+              </Button>
+            </Tooltip>
+            <Tooltip content="Edit Member" showArrow delay={500}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => onEdit(member)}
+                className="text-foreground/60 hover:text-primary hover:bg-primary/10"
+              >
+                <FiEdit2 size={16} />
+              </Button>
+            </Tooltip>
           </div>
         );
       default:

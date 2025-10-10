@@ -10,6 +10,7 @@ import {
   Chip,
   Divider,
   Avatar,
+  Tooltip,
 } from "@heroui/react";
 import { MdEmail, MdPerson, MdSchool, MdPhone } from "react-icons/md";
 import {
@@ -25,6 +26,26 @@ import { FaUser } from "react-icons/fa";
 
 export default function ViewMemberModal({ isOpen, onClose, member }) {
   if (!member) return null;
+
+  // Helper function to get full form of vertical abbreviations
+  const getVerticalTooltip = (vertical) => {
+    const tooltips = {
+      OTI: "Office of Technology & Innovation",
+      OSG: "Office of Strategy & Growth",
+      OCD: "Office of Creativity & Design",
+    };
+    return tooltips[vertical] || null;
+  };
+
+  // Helper function to get full form of role abbreviations
+  const getRoleTooltip = (role) => {
+    const tooltips = {
+      CTO: "Chief Technology Officer",
+      CCO: "Chief Creative Officer",
+      CSO: "Chief Strategy Officer",
+    };
+    return tooltips[role] || null;
+  };
 
   // Helper function to format special role
   const formatSpecialRole = (role) => {
@@ -57,6 +78,7 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
     isPrimary = false,
     isClickable = false,
     clickType = null,
+    tooltip = null,
   }) => {
     // Don't render if value is empty, null, or undefined (but render "N/A")
     if (
@@ -84,6 +106,28 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
 
     const href = getClickableHref();
 
+    const chipContent = isPrimary ? (
+      tooltip ? (
+        <Tooltip content={tooltip} delay={300}>
+          <Chip
+            size="sm"
+            variant="flat"
+            className="bg-primary/20 text-primary border border-primary/30 cursor-help"
+          >
+            {value}
+          </Chip>
+        </Tooltip>
+      ) : (
+        <Chip
+          size="sm"
+          variant="flat"
+          className="bg-primary/20 text-primary border border-primary/30"
+        >
+          {value}
+        </Chip>
+      )
+    ) : null;
+
     const content = (
       <>
         <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shrink-0">
@@ -92,13 +136,7 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
         <div className="flex-1 min-w-0">
           <p className="text-xs text-foreground/60 mb-0.5">{label}</p>
           {isPrimary ? (
-            <Chip
-              size="sm"
-              variant="flat"
-              className="bg-primary/20 text-primary border border-primary/30"
-            >
-              {value}
-            </Chip>
+            chipContent
           ) : Array.isArray(value) ? (
             <div className="flex flex-wrap gap-1">
               {value.map((item, index) => (
@@ -251,6 +289,9 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
                 label="Vertical / Team"
                 value={member.vertical || "N/A"}
                 isPrimary={!!member.vertical}
+                tooltip={
+                  member.vertical ? getVerticalTooltip(member.vertical) : null
+                }
               />
 
               <InfoRow
@@ -265,6 +306,21 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               label="Special Role"
               value={formatSpecialRole(member.specialRole) || "N/A"}
               isPrimary={!!member.specialRole}
+              tooltip={
+                member.specialRole
+                  ? (() => {
+                      const formattedRole = formatSpecialRole(
+                        member.specialRole
+                      );
+                      const roleWords = formattedRole?.split(" ") || [];
+                      const acronym = roleWords.find(
+                        (word) =>
+                          word === "CTO" || word === "CCO" || word === "CSO"
+                      );
+                      return acronym ? getRoleTooltip(acronym) : null;
+                    })()
+                  : null
+              }
             />
 
             {/* Contact Information */}
