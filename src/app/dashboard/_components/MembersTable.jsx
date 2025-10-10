@@ -58,7 +58,7 @@ export default function MembersTable({
     { key: "branch", label: "Branch", sortable: true },
     { key: "rollNo", label: "Roll no.", sortable: true },
     { key: "vertical", label: "Vertical / Team", sortable: false },
-    { key: "subdomain", label: "Sub Domain", sortable: false },
+    { key: "subdomain", label: "Domain", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -80,6 +80,21 @@ export default function MembersTable({
       CSO: "Chief Strategy Officer",
     };
     return tooltips[role] || null;
+  };
+
+  // Helper function to format year number to ordinal string
+  const formatYear = (year) => {
+    if (!year) return "-";
+
+    const suffixes = {
+      1: "st",
+      2: "nd",
+      3: "rd",
+      4: "th",
+      5: "th",
+    };
+
+    return `${year}${suffixes[year] || "th"}`;
   };
 
   // Helper function to format special role
@@ -270,7 +285,9 @@ export default function MembersTable({
           </div>
         );
       case "year":
-        return <span className="text-foreground/80">{member.year || "-"}</span>;
+        return (
+          <span className="text-foreground/80">{formatYear(member.year)}</span>
+        );
       case "branch":
         return (
           <span className="text-foreground/80">{member.branch || "-"}</span>

@@ -18,7 +18,12 @@ export default function DashboardContent({ initialMembers = [] }) {
   const [members, setMembers] = useState(initialMembers);
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [searchValue, setSearchValue] = useState("");
-  const [filterBy, setFilterBy] = useState(new Set([]));
+  const [filters, setFilters] = useState({
+    years: new Set([]),
+    branches: new Set([]),
+    verticals: new Set([]),
+    subdomains: new Set([]),
+  });
   const [sortDescriptor, setSortDescriptor] = useState({
     column: null,
     direction: null,
@@ -51,18 +56,52 @@ export default function DashboardContent({ initialMembers = [] }) {
       );
     }
 
-    // Apply vertical filter (multiselect)
-    if (filterBy.size > 0 && filterBy !== "all") {
-      const filterArray = Array.from(filterBy);
+    // Apply year filter
+    if (filters.years.size > 0) {
+      const yearArray = Array.from(filters.years);
+      filtered = filtered.filter((member) => {
+        // Convert year strings like "1st", "2nd" to numbers like 1, 2
+        return yearArray.some((year) => {
+          const yearNum = parseInt(year); // "1st" -> 1, "2nd" -> 2, etc.
+          return member.year === yearNum;
+        });
+      });
+    }
+
+    // Apply branch filter
+    if (filters.branches.size > 0) {
+      const branchArray = Array.from(filters.branches);
       filtered = filtered.filter((member) =>
-        filterArray.some(
-          (filter) => member.vertical?.toLowerCase() === filter.toLowerCase()
+        branchArray.some(
+          (branch) => member.branch?.toLowerCase() === branch.toLowerCase()
+        )
+      );
+    }
+
+    // Apply vertical filter
+    if (filters.verticals.size > 0) {
+      const verticalArray = Array.from(filters.verticals);
+      filtered = filtered.filter((member) =>
+        verticalArray.some(
+          (vertical) =>
+            member.vertical?.toLowerCase() === vertical.toLowerCase()
+        )
+      );
+    }
+
+    // Apply subdomain filter
+    if (filters.subdomains.size > 0) {
+      const subdomainArray = Array.from(filters.subdomains);
+      filtered = filtered.filter((member) =>
+        subdomainArray.some(
+          (subdomain) =>
+            member.subdomain?.toLowerCase() === subdomain.toLowerCase()
         )
       );
     }
 
     return filtered;
-  }, [members, searchValue, filterBy]);
+  }, [members, searchValue, filters]);
 
   // Handle add member
   const handleAddMember = async (newMemberData) => {
@@ -159,11 +198,12 @@ export default function DashboardContent({ initialMembers = [] }) {
       <TableHeader
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        filterBy={filterBy}
-        onFilterChange={setFilterBy}
+        filters={filters}
+        onFilterChange={setFilters}
         selectedCount={selectedCount}
         onDeleteSelected={() => setIsDeleteModalOpen(true)}
         onAddMember={() => setIsAddModalOpen(true)}
+        allMembers={members}
       />
 
       <MembersTable
