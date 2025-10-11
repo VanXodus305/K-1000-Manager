@@ -234,7 +234,7 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
                 className="w-32 h-32"
                 color="primary"
                 classNames={{
-                  base: "shrink-0 border-2 border-primary/30 shadow-lg shadow-primary/50",
+                  base: "shrink-0 border-2 border-primary/30 shadow-lg shadow-primary/20",
                   icon: "text-foreground/80",
                 }}
               />
