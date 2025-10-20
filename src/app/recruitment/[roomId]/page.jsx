@@ -373,7 +373,7 @@ export default function RoomPanel() {
                   </div>
 
                   <p className="text-xs text-foreground/50 mt-1">
-                    {new Date(panel.updatedAt).toLocaleTimeString()}
+                    Last Updated: {new Date(panel.updatedAt).toLocaleTimeString()}
                   </p>
                 </CardBody>
               </Card>
