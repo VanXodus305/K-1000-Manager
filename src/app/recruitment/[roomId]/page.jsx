@@ -370,6 +370,7 @@ export default function RoomPanel() {
       {/* Edit Panel Modal */}
       <Modal
         isOpen={isEditModalOpen}
+        backdrop="blur"
         onClose={() => setIsEditModalOpen(false)}
         size="sm"
         className="max-w-md"
@@ -388,6 +389,7 @@ export default function RoomPanel() {
               label="Panel Name"
               placeholder="e.g., Panel A"
               size="sm"
+              color="primary"
               value={editFormData.name}
               onValueChange={(value) =>
                 setEditFormData({ ...editFormData, name: value })
@@ -409,13 +411,22 @@ export default function RoomPanel() {
                 setEditFormData({ ...editFormData, branch: selected });
               }}
               classNames={{
-                label: "text-foreground/70 text-sm",
-                trigger: "bg-background-100/60 border border-primary/30",
-                value: "text-foreground text-sm",
+                label: "text-foreground/80",
+                trigger:
+                  "bg-background-200/60 border border-primary/20 hover:border-primary/40 data-[hover=true]:bg-background-200/80",
+                value: "text-foreground",
+                popoverContent:
+                  "bg-background-200/95 backdrop-blur-md border border-primary/30",
               }}
             >
               {VERTICALS.map((branch) => (
-                <SelectItem key={branch} value={branch} textValue={branch}>
+                <SelectItem
+                  key={branch}
+                  color="primary"
+                  variant="flat"
+                  value={branch}
+                  textValue={branch}
+                >
                   {branch}
                 </SelectItem>
               ))}

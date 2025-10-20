@@ -351,6 +351,7 @@ export default function RecruitmentSetup() {
       {/* Configuration Modal */}
       <Modal
         isOpen={isConfigModalOpen}
+        backdrop="blur"
         onClose={() => setIsConfigModalOpen(false)}
         size="3xl"
         scrollBehavior="inside"
@@ -373,6 +374,7 @@ export default function RecruitmentSetup() {
                 <Input
                   type="number"
                   label="Number of Rooms"
+                  color="primary"
                   placeholder="Enter number of rooms (1-20)"
                   min="1"
                   max="20"
@@ -402,6 +404,7 @@ export default function RecruitmentSetup() {
 
                         <Input
                           label="Room Name"
+                          color="primary"
                           placeholder="e.g., Tech Interview Room"
                           value={room.name}
                           onValueChange={(value) =>
@@ -439,6 +442,7 @@ export default function RecruitmentSetup() {
                               <div className="flex flex-col gap-2">
                                 <Input
                                   label={`Panel ${panelIdx + 1} Name`}
+                                  color="primary"
                                   placeholder="e.g., Panel A"
                                   value={panel.name}
                                   onValueChange={(value) =>
@@ -471,14 +475,21 @@ export default function RecruitmentSetup() {
                                     );
                                   }}
                                   classNames={{
-                                    label: "text-foreground/70 text-xs",
+                                    label: "text-foreground/80",
                                     trigger:
-                                      "bg-background-100/60 border border-primary/30 h-10",
-                                    value: "text-foreground text-sm",
+                                      "bg-background-200/60 border border-primary/20 hover:border-primary/40 data-[hover=true]:bg-background-200/80",
+                                    value: "text-foreground",
+                                    popoverContent:
+                                      "bg-background-200/95 backdrop-blur-md border border-primary/30",
                                   }}
                                 >
                                   {VERTICALS.map((vertical) => (
-                                    <SelectItem key={vertical} value={vertical}>
+                                    <SelectItem
+                                      key={vertical}
+                                      color="primary"
+                                      variant="flat"
+                                      value={vertical}
+                                    >
                                       {vertical}
                                     </SelectItem>
                                   ))}
@@ -546,6 +557,7 @@ export default function RecruitmentSetup() {
       {/* Edit Room Modal */}
       <Modal
         isOpen={isEditRoomModalOpen}
+        backdrop="blur"
         onClose={() => setIsEditRoomModalOpen(false)}
         size="sm"
       >
@@ -561,6 +573,7 @@ export default function RecruitmentSetup() {
           <ModalBody className="py-4 gap-4">
             <Input
               label="Room Name"
+              color="primary"
               placeholder="Enter room name"
               value={editRoomName}
               onValueChange={setEditRoomName}
