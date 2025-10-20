@@ -16,6 +16,7 @@ import { FiSearch, FiFilter } from "react-icons/fi";
 import { MdDeleteOutline, MdClose } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import { useState } from "react";
+import { VERTICALS } from "@/constants/verticals";
 import localFont from "next/font/local";
 
 const conthrax = localFont({
@@ -54,23 +55,10 @@ export default function TableHeader({
       label: branch,
     }));
 
-  const verticalOptions = [
-    { value: "operations", label: "Operations" },
-    { value: "oti", label: "OTI" },
-    { value: "osg", label: "OSG" },
-    { value: "ocd", label: "OCD" },
-    { value: "public relations", label: "Public Relations" },
-    { value: "campus ambassadors", label: "Campus Ambassadors" },
-    {
-      value: "academic & internship guidance",
-      label: "Academic & Internship Guidance",
-    },
-    { value: "research & publications", label: "Research & Publications" },
-    { value: "training program", label: "Training Program" },
-    { value: "higher studies", label: "Higher Studies" },
-    { value: "project wing", label: "Project Wing" },
-    { value: "event management", label: "Event Management" },
-  ];
+  const verticalOptions = VERTICALS.map((vertical) => ({
+    value: vertical.toLowerCase(),
+    label: vertical,
+  }));
 
   const subdomainOptions = [
     ...new Set(allMembers.map((m) => m.subdomain).filter(Boolean)),

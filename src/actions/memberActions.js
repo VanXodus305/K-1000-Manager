@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import User from "../models/userModel";
 import { revalidatePath } from "next/cache";
 import { deleteImage } from "./imageActions";
+import { VERTICALS } from "@/constants/verticals";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -262,21 +263,8 @@ export async function getFormOptions() {
     // Year options (hardcoded as these are standard)
     const yearOptions = ["1st", "2nd", "3rd", "4th", "5th"];
 
-    // Vertical options from the model enum
-    const verticalOptions = [
-      "Operations",
-      "OTI",
-      "OSG",
-      "OCD",
-      "Public Relations",
-      "Campus Ambassadors",
-      "Academic & Internship Guidance",
-      "Research & Publications",
-      "Training Program",
-      "Higher Studies",
-      "Project Wing",
-      "Event Management",
-    ];
+    // Vertical options from constants
+    const verticalOptions = VERTICALS;
 
     return {
       success: true,
@@ -295,20 +283,7 @@ export async function getFormOptions() {
       options: {
         years: ["1st", "2nd", "3rd", "4th", "5th"],
         branches: [],
-        verticals: [
-          "Operations",
-          "OTI",
-          "OSG",
-          "OCD",
-          "Public Relations",
-          "Campus Ambassadors",
-          "Academic & Internship Guidance",
-          "Research & Publications",
-          "Training Program",
-          "Higher Studies",
-          "Project Wing",
-          "Event Management",
-        ],
+        verticals: VERTICALS,
         subdomains: [],
       },
     };

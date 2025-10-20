@@ -27,6 +27,7 @@ import {
   FaAward,
   FaUser,
 } from "react-icons/fa";
+import { VERTICAL_DISPLAY_NAMES } from "@/constants/verticals";
 import localFont from "next/font/local";
 
 const conthrax = localFont({
@@ -64,12 +65,7 @@ export default function MembersTable({
 
   // Helper function to get full form of vertical abbreviations
   const getVerticalTooltip = (vertical) => {
-    const tooltips = {
-      OTI: "Office of Technology & Innovation",
-      OSG: "Office of Strategy & Growth",
-      OCD: "Office of Creativity & Design",
-    };
-    return tooltips[vertical] || null;
+    return VERTICAL_DISPLAY_NAMES[vertical] || null;
   };
 
   // Helper function to get full form of role abbreviations

@@ -81,6 +81,7 @@ const userSchema = new mongoose.Schema(
         "OTI",
         "OSG",
         "OCD",
+        "OCC",
         "Public Relations",
         "Campus Ambassadors",
         "Academic & Internship Guidance",

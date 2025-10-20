@@ -20,6 +20,7 @@ import { getFormOptions } from "@/actions/memberActions";
 import { uploadImage, deleteImage } from "@/actions/imageActions";
 import { FaUser, FaCamera } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { VERTICALS } from "@/constants/verticals";
 
 export default function MemberFormModal({
   isOpen,
@@ -60,20 +61,7 @@ export default function MemberFormModal({
   const [formOptions, setFormOptions] = useState({
     years: ["1st", "2nd", "3rd", "4th", "5th"],
     branches: [],
-    verticals: [
-      "Operations",
-      "OTI",
-      "OSG",
-      "OCD",
-      "Public Relations",
-      "Campus Ambassadors",
-      "Academic & Internship Guidance",
-      "Research & Publications",
-      "Training Program",
-      "Higher Studies",
-      "Project Wing",
-      "Event Management",
-    ],
+    verticals: VERTICALS,
     subdomains: [],
     specialRoles: [
       { key: "president", label: "President" },
