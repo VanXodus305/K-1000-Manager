@@ -1,6 +1,25 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
+// Helper to fetch user role from database
+async function getUserRole(email) {
+  try {
+    const mongoose = await import("mongoose");
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (mongoose.default.connection.readyState === 0) {
+      await mongoose.default.connect(MONGODB_URI);
+    }
+
+    const User = (await import("@/models/userModel")).default;
+    const user = await User.findOne({ email });
+    return user?.role || "member";
+  } catch (error) {
+    console.error("Error fetching user role:", error);
+    return "member";
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
   pages: {
@@ -22,9 +41,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    session({ session, token }) {
-      if (token.role) {
-        session.user.role = token.role;
+    async session({ session, token }) {
+      if (session.user?.email) {
+        const role = await getUserRole(session.user.email);
+        session.user.role = role;
       }
       return session;
     },

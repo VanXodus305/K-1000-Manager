@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardBody,
@@ -37,6 +39,8 @@ const conthrax = localFont({
 });
 
 export default function RecruitmentSetup() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [rooms, setRooms] = useState([]);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [numRooms, setNumRooms] = useState("");
@@ -48,10 +52,17 @@ export default function RecruitmentSetup() {
   const [editRoomName, setEditRoomName] = useState("");
   const [isEditRoomLoading, setIsEditRoomLoading] = useState(false);
 
-  // Fetch saved rooms on component mount
+  // Check authorization on mount and redirect if not admin
   useEffect(() => {
-    fetchRooms();
-  }, []);
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    } else if (status === "authenticated" && session?.user?.role !== "admin") {
+      router.push("/recruitment/status");
+    } else if (status === "authenticated" && session?.user?.role === "admin") {
+      // Only fetch rooms if authenticated as admin
+      fetchRooms();
+    }
+  }, [status, session, router]);
 
   const fetchRooms = async () => {
     try {

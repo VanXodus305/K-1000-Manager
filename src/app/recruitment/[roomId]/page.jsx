@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import {
   Card,
   CardBody,
@@ -36,6 +37,7 @@ const conthrax = localFont({
 });
 
 export default function RoomPanel() {
+  const { data: session, status } = useSession();
   const params = useParams();
   const router = useRouter();
   const roomId = params.roomId;
@@ -47,6 +49,19 @@ export default function RoomPanel() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({ name: "", branch: "" });
   const [isEditLoading, setIsEditLoading] = useState(false);
+
+  // Check authorization on mount
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    } else if (
+      status === "authenticated" &&
+      session?.user?.role !== "admin" &&
+      session?.user?.role !== "rec-man"
+    ) {
+      router.push("/recruitment/status");
+    }
+  }, [status, session, router]);
 
   // Fetch room details
   const fetchRoom = useCallback(async () => {
