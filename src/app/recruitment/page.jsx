@@ -81,11 +81,22 @@ export default function RecruitmentSetup() {
     const num = parseInt(value) || 0;
 
     if (num > 0) {
+      // Find the next available room number by checking existing rooms
+      const existingRoomNumbers = savedRooms
+        .map((room) => {
+          const match = room.roomId.match(/^room-(\d+)$/);
+          return match ? parseInt(match[1]) : 0;
+        })
+        .filter((n) => n > 0);
+
+      const maxExistingNumber =
+        existingRoomNumbers.length > 0 ? Math.max(...existingRoomNumbers) : 0;
+
       const newConfig = Array(num)
         .fill(null)
         .map((_, idx) => ({
-          roomId: `room-${idx + 1}`,
-          name: `Room ${idx + 1}`,
+          roomId: `room-${maxExistingNumber + idx + 1}`,
+          name: `Room ${maxExistingNumber + idx + 1}`,
           panels: [{ name: "Panel 1", branch: "" }],
         }));
       setRoomsConfig(newConfig);
@@ -143,7 +154,11 @@ export default function RecruitmentSetup() {
     try {
       const result = await configureRooms(roomsConfig);
       if (result.success) {
-        setSavedRooms(result.rooms);
+        // Merge new rooms with existing rooms and sort by name
+        const mergedRooms = [...savedRooms, ...result.rooms].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setSavedRooms(mergedRooms);
         setIsConfigModalOpen(false);
         setNumRooms("");
         setRoomsConfig([]);
@@ -175,11 +190,12 @@ export default function RecruitmentSetup() {
     try {
       const result = await updateRoomName(editingRoom.roomId, editRoomName);
       if (result.success) {
-        setSavedRooms(
-          savedRooms.map((room) =>
+        const updatedRooms = savedRooms
+          .map((room) =>
             room.roomId === editingRoom.roomId ? result.room : room
           )
-        );
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setSavedRooms(updatedRooms);
         setIsEditRoomModalOpen(false);
         setEditingRoom(null);
       } else {

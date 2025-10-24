@@ -8,10 +8,7 @@ export async function configureRooms(roomsData) {
   try {
     await connectDB();
 
-    // Delete existing rooms
-    await Recruitment.deleteMany({});
-
-    // Create new rooms with their panels
+    // Create new rooms with their panels (add to existing rooms)
     const createdRooms = await Promise.all(
       roomsData.map(async (room) => {
         const newRoom = new Recruitment({
@@ -46,7 +43,7 @@ export async function configureRooms(roomsData) {
 export async function getAllRooms() {
   try {
     await connectDB();
-    const rooms = await Recruitment.find({}).sort({ createdAt: 1 });
+    const rooms = await Recruitment.find({}).sort({ name: 1 });
     return {
       success: true,
       rooms: JSON.parse(JSON.stringify(rooms)),
