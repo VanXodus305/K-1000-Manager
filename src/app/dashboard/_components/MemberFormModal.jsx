@@ -18,12 +18,19 @@ import {
 } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import { I18nProvider } from "@react-aria/i18n";
+import localFont from "next/font/local";
 import React, { useState, useEffect } from "react";
 import { getFormOptions } from "@/actions/memberActions";
 import { uploadImage, deleteImage } from "@/actions/imageActions";
 import { FaUser, FaCamera } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { VERTICALS } from "@/constants/verticals";
+
+const conthrax = localFont({
+  src: "../../../../public/fonts/Conthrax-SemiBold.otf",
+  variable: "--font-conthrax",
+  display: "swap",
+});
 
 export default function MemberFormModal({
   isOpen,
@@ -176,12 +183,6 @@ export default function MemberFormModal({
     return "";
   };
 
-  // Auto-generate email from roll number
-  const generateEmailFromRollNo = (rollNo) => {
-    if (!rollNo) return "";
-    return `${rollNo}@kiit.ac.in`;
-  };
-
   // Validation functions
   const validateEmail = (email) => {
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -223,9 +224,6 @@ export default function MemberFormModal({
       if (calculatedYear) {
         newFormData.year = calculatedYear;
       }
-
-      // Auto-generate email
-      newFormData.email = generateEmailFromRollNo(numericValue);
 
       // Validate roll number
       if (numericValue && !validateRollNumber(numericValue)) {
@@ -595,7 +593,7 @@ export default function MemberFormModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="KIIT Email"
-                  placeholder="Auto-generated from roll number"
+                  placeholder="Enter KIIT email address"
                   value={formData.email}
                   onValueChange={(value) => handleChange("email", value)}
                   isInvalid={!!errors.email}
@@ -631,7 +629,7 @@ export default function MemberFormModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Select
                   label="Year"
-                  placeholder="Auto-calculated from roll number"
+                  placeholder="Enter your academic year"
                   selectedKeys={formData.year ? [formData.year] : []}
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0];

@@ -14,9 +14,37 @@ import {
 } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import { signOutAndRedirect } from "@/app/sign-in/auth";
+import { useEffect, useState } from "react";
 
 export default function GlobalNavbar() {
   const { data: session } = useSession();
+  const [profileImage, setProfileImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setIsLoading(true);
+      const fetchProfileImage = async () => {
+        try {
+          const { getUserFromDB } = await import("@/actions/userActions");
+          const user = await getUserFromDB();
+          if (user?.profileImage) {
+            setProfileImage(user.profileImage);
+          } else {
+            // Fallback to Google image if no database image
+            setProfileImage(session.user.image);
+          }
+        } catch (error) {
+          console.error("Error fetching profile image:", error);
+          // Fallback to Google image on error
+          setProfileImage(session.user.image);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchProfileImage();
+    }
+  }, [session?.user?.email, session?.user?.image]);
 
   return (
     <Navbar
@@ -48,9 +76,12 @@ export default function GlobalNavbar() {
               <span className="text-sm font-medium text-foreground hidden sm:block">
                 {session.user.name}
               </span>
-              <Dropdown placement="bottom-end" classNames={{
-                base: 'overflow-hidden'
-              }}>
+              <Dropdown
+                placement="bottom-end"
+                classNames={{
+                  base: "overflow-hidden",
+                }}
+              >
                 <DropdownTrigger>
                   <Avatar
                     as="button"
@@ -59,7 +90,7 @@ export default function GlobalNavbar() {
                     name={session.user.name}
                     size="sm"
                     showFallback
-                    src={session.user.image}
+                    src={profileImage || session.user.image}
                   />
                 </DropdownTrigger>
                 <DropdownMenu

@@ -296,3 +296,73 @@ export async function getFormOptions() {
     };
   }
 }
+
+export async function updateMemberProfile(memberData) {
+  try {
+    await connectDB();
+    const { auth } = await import("@/utils/auth");
+    const session = await auth();
+
+    if (!session || !session.user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const updatedMember = await User.findOneAndUpdate(
+      { email: session.user.email },
+      {
+        name: memberData.name,
+        email: memberData.email,
+        personalEmail: memberData.personalEmail || null,
+        rollNumber: memberData.rollNo,
+        branch: memberData.branch || null,
+        year: parseInt(memberData.year),
+        vertical: memberData.vertical,
+        subdomain: memberData.subdomain || null,
+        phoneNumber: memberData.phoneNumber || null,
+        whatsappNumber: memberData.whatsappNumber || null,
+        birthday: memberData.birthday || null,
+        profileImage: memberData.profileImage || null,
+        socialLinks: memberData.socialLinks || {
+          linkedin: "",
+          github: "",
+          instagram: "",
+        },
+        otherSocieties: memberData.otherSocieties || [],
+      },
+      { new: true }
+    );
+
+    if (!updatedMember) {
+      return { success: false, error: "Member not found" };
+    }
+
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      member: {
+        id: updatedMember._id.toString(),
+        name: updatedMember.name,
+        email: updatedMember.email,
+        personalEmail: updatedMember.personalEmail,
+        profileImage: updatedMember.profileImage,
+        rollNumber: updatedMember.rollNumber,
+        rollNo: updatedMember.rollNumber,
+        branch: updatedMember.branch,
+        year: updatedMember.year,
+        vertical: updatedMember.vertical,
+        subdomain: updatedMember.subdomain,
+        phoneNumber: updatedMember.phoneNumber,
+        whatsappNumber: updatedMember.whatsappNumber,
+        birthday: updatedMember.birthday
+          ? updatedMember.birthday.toISOString()
+          : null,
+        socialLinks: updatedMember.socialLinks,
+        otherSocieties: updatedMember.otherSocieties,
+      },
+    };
+  } catch (error) {
+    console.error("Error updating member profile:", error);
+    return { success: false, error: error.message };
+  }
+}

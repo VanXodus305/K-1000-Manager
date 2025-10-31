@@ -4,7 +4,7 @@ import { auth } from "@/utils/auth";
 import { getUserFromDB } from "@/actions/userActions";
 import { getAllMembers } from "@/actions/memberActions";
 import DashboardContent from "./_components/DashboardContent";
-import AccessDenied from "./_components/AccessDenied";
+import MemberProfilePage from "./_components/MemberProfilePage";
 
 export default async function Dashboard() {
   const session = await auth();
@@ -18,7 +18,9 @@ export default async function Dashboard() {
 
   // Check if user is admin
   if (!user || user.role !== "admin") {
-    return <AccessDenied />;
+    // Redirect non-admin users to member profile page
+    // The component will fetch user data on the client side
+    return <MemberProfilePage />;
   }
 
   // Fetch all members from database
