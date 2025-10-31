@@ -25,7 +25,7 @@ export async function getAllMembers() {
 
     const members = await User.find({})
       .select(
-        "_id name email rollNumber branch year vertical subdomain specialRole phoneNumber whatsappNumber personalEmail profileImage socialLinks otherSocieties createdAt updatedAt"
+        "_id name email rollNumber branch year vertical subdomain specialRole phoneNumber whatsappNumber personalEmail profileImage socialLinks otherSocieties birthday createdAt updatedAt"
       )
       .lean();
 
@@ -44,6 +44,7 @@ export async function getAllMembers() {
       whatsappNumber: member.whatsappNumber || "",
       personalEmail: member.personalEmail || "",
       profileImage: member.profileImage || "",
+      birthday: member.birthday ? member.birthday.toISOString() : null,
       socialLinks: member.socialLinks || {
         linkedin: "",
         github: "",
@@ -76,6 +77,7 @@ export async function addMember(memberData) {
       vertical: memberData.vertical,
       subdomain: memberData.subdomain || null,
       specialRole: memberData.specialRole || null,
+      birthday: memberData.birthday || null,
       phoneNumber: memberData.phoneNumber || null,
       whatsappNumber: memberData.whatsappNumber || null,
       socialLinks: memberData.socialLinks || {
@@ -103,6 +105,7 @@ export async function addMember(memberData) {
         vertical: newMember.vertical,
         subdomain: newMember.subdomain,
         specialRole: newMember.specialRole,
+        birthday: newMember.birthday ? newMember.birthday.toISOString() : null,
         phoneNumber: newMember.phoneNumber,
         whatsappNumber: newMember.whatsappNumber,
         socialLinks: newMember.socialLinks,
@@ -132,6 +135,7 @@ export async function updateMember(memberId, memberData) {
         vertical: memberData.vertical,
         subdomain: memberData.subdomain || null,
         specialRole: memberData.specialRole || null,
+        birthday: memberData.birthday || null,
         phoneNumber: memberData.phoneNumber || null,
         whatsappNumber: memberData.whatsappNumber || null,
         socialLinks: memberData.socialLinks || {
@@ -164,6 +168,9 @@ export async function updateMember(memberId, memberData) {
         vertical: updatedMember.vertical,
         subdomain: updatedMember.subdomain,
         specialRole: updatedMember.specialRole,
+        birthday: updatedMember.birthday
+          ? updatedMember.birthday.toISOString()
+          : null,
         phoneNumber: updatedMember.phoneNumber,
         whatsappNumber: updatedMember.whatsappNumber,
         socialLinks: updatedMember.socialLinks,

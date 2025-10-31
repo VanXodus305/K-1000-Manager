@@ -20,6 +20,7 @@ import {
   FaGithub,
   FaInstagram,
   FaWhatsapp,
+  FaBirthdayCake,
 } from "react-icons/fa";
 import { BiSolidBriefcase } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
@@ -65,6 +66,17 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
       .join(" ");
 
     return formatted;
+  };
+
+  // Helper function to format birthday
+  const formatBirthday = (birthday) => {
+    if (!birthday) return null;
+    const date = new Date(birthday);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const InfoRow = ({
@@ -272,6 +284,14 @@ export default function ViewMemberModal({ isOpen, onClose, member }) {
               label="Roll Number"
               value={member.rollNo}
             />
+
+            {member.birthday && (
+              <InfoRow
+                icon={FaBirthdayCake}
+                label="Birthday"
+                value={formatBirthday(member.birthday)}
+              />
+            )}
 
             {/* K-1000 Information */}
             <Divider className="my-2" />

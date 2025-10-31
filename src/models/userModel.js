@@ -121,6 +121,11 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    birthday: {
+      type: Date,
+      default: null,
+    },
+
     role: {
       type: String,
       enum: ["admin", "member", "rec-man"],
